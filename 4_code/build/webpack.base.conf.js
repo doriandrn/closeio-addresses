@@ -49,7 +49,7 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract( 'style', 'css!sass' )
+        loader: ExtractTextPlugin.extract( 'style', 'css!postcss!sass' )
       },
       { 
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, 
@@ -76,7 +76,6 @@ module.exports = {
         short,
         magic({atRoot: true}),
         pxtorem({replace: false}),
-        currency,
         magician,
         ap
       ]
