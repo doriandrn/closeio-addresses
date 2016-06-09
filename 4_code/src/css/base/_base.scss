@@ -1,0 +1,56 @@
+@viewport { width: device-width; }
+
+html {
+  box-sizing: border-box;
+  height: 100%;
+  max-width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  &:before,
+  &:after { box-sizing: inherit; }
+}
+
+body {
+  font-family: $font-family-default;
+  max-width: 100%;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+a {
+  background: transparent;
+  text-decoration: none;
+  transition: color .2s;
+  outline: none;
+}
+
+img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $font-family-sans;
+  font-weight: normal;
+  margin-top: 0
+}
+
+input,
+button {
+  background: transparent;
+  box-shadow: none;
+  padding: 0 15px;
+  line-height: inherit;
+  border: none;
+}
