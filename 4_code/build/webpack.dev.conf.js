@@ -1,6 +1,7 @@
 var webpack = require('webpack')
 var config = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
+var ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 // eval-source-map is faster for development
 config.devtool = 'eval-source-map'
@@ -19,6 +20,7 @@ var polyfill = 'eventsource-polyfill'
 config.output.publicPath = '/'
 
 config.plugins = (config.plugins || []).concat([
+  new ExtractTextPlugin('[name].[contenthash].css'),
   new webpack.optimize.OccurenceOrderPlugin(),
   new webpack.NoErrorsPlugin(),
   new HtmlWebpackPlugin({

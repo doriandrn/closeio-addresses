@@ -8,8 +8,6 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 config.output.filename = '[name].[chunkhash].js'
 config.output.chunkFilename = '[id].[chunkhash].js'
 
-// whether to generate source map for production files.
-// disabling this can speed up the build.
 var SOURCE_MAP = true
 
 config.devtool = SOURCE_MAP ? 'source-map' : false
@@ -22,26 +20,25 @@ function generateExtractLoaders (loaders) {
 }
 
 config.plugins = (config.plugins || []).concat([
+  new webpack.optimize.OccurenceOrderPlugin(),
+  new ExtractTextPlugin('[name].[contenthash].css'),
   new webpack.DefinePlugin({
     'process.env': {
       NODE_ENV: '"production"'
     }
   }),
+  // new ExtractTextPlugin('[name].[contenthash].css' ),
   // generate dist index.html with correct asset hash for caching.
   new HtmlWebpackPlugin({
-    title: 'Zigo Test',
+    title: 'Address Modal',
     template: 'src/index.pug',
-    filename: 'index.html',
-    // inject: false,
+    filename: 'index.html'
   }),
   // new webpack.optimize.UglifyJsPlugin({
   //   compress: {
   //     warnings: false
   //   }
   // }),
-  new webpack.optimize.OccurenceOrderPlugin(),
-  // extract css into its own file
-  new ExtractTextPlugin('[name].[contenthash].css'),
 ])
 
 module.exports = config

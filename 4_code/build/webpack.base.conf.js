@@ -3,7 +3,8 @@ var path        = require('path'),
     short       = require('postcss-short'),
     magic       = require('postcss-magic-animations'),
     magician    = require('postcss-font-magician'),
-    pxtorem     = require('postcss-pxtorem');
+    pxtorem     = require('postcss-pxtorem'),
+    ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -11,7 +12,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, '../dist'),
-    publicPath: '/dist/',
+    publicPath: '',
     filename: '[name].js'
   },
   resolve: {
@@ -48,7 +49,7 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        loaders: 'sass'
+        loader: ExtractTextPlugin.extract( 'style', 'css!sass' )
       },
       { 
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, 
@@ -65,6 +66,9 @@ module.exports = {
   },
   eslint: {
     formatter: require('eslint-friendly-formatter')
+  },
+  sassLoader: {
+    includePaths: [ './src' ]
   },
   postcss: function() {
     return {
