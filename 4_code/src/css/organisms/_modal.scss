@@ -6,7 +6,8 @@
 	padding: 50px;
 	height: 100%;
 
-	&__form {
+	&__form,
+	&__cancel {
 		opacity: 0;
 		visibility: hidden;
 		max-height: 0;
@@ -67,10 +68,13 @@
 				top: 100px;
 			}
 
-			&__form {
+			&__form,
+			&__cancel {
 				opacity: 1;
 				visibility: visible;
 				max-height: 1000px;
+				margin-bottom: 30px;
+				overflow: visible;
 			}
 
 			&__action {

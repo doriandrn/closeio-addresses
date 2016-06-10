@@ -13,11 +13,11 @@ html
 				form.form.form--nojs.modal__form
 					.form__row
 						select.form__select.address__tags
-							option.form__select__option Business
-							option.form__select__option Mailing
-							option.form__select__option Other
+							option.form__select__option(value='business' data-color='#015F9B' selected) Business
+							option.form__select__option(value='mailing' data-color='#DA00F8') Mailing
+							option.form__select__option(value='other') Other
 					.form__row
-						textarea#address.address__textarea
+						textarea#address.address__textarea(autofocus placeholder="Enter your address...")
 					fieldset.form__address
 						.form__row
 							input(type="text" placeholder="Address")
@@ -29,6 +29,6 @@ html
 							input(type="text" placeholder="Postal Code")
 						.form__row
 					.form__submit
-						input.button.button__large.button__color(type="submit")
-					.form__cancel
-						button(data-action="cancel-add-new") Cancel
+						input.button.button__large.button__color(type="submit" value="Save")
+				.modal__cancel
+					button(data-action="cancel-add-new") Cancel

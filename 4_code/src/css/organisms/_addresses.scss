@@ -9,8 +9,28 @@
 	}
 
 	&__tags {
+		@include reset-list;
 		display: block;
 		margin-bottom: 30px;
+	}
+
+	&__tag {
+		display: inline-block;
+		vertical-align: top;
+		margin: 0 5px;
+		padding: 0 10px;
+		background: rgba( black, .1 );
+		border-radius: 20px;
+		transition: all .1s ease-in-out;
+
+		&:not(.active) {
+			cursor: pointer;
+			opacity: .2;
+
+			&:hover {
+				opacity: 1;
+			}
+		}
 	}
 
 	&__textarea {
