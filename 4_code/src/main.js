@@ -6,6 +6,8 @@ let
 	map,
 	marker,
 	infowindow,
+	addressInput,
+	currentAddress,
 	componentForm = {
 	  street_number: 'short_name',
 	  route: 'long_name',
@@ -23,6 +25,11 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 		return;
 	}
 
+	currentAddress = modal.querySelector('.address__current');
+	addressInput = document.getElementById('address');
+
+	let defaultState = currentAddress.textContent;
+
 	initTags( modal );
 	initAutocomplete();
 
@@ -37,23 +44,33 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 		switch( buttonAction ) {
 			case 'add-new':
 				modal.classList.add( 'not-empty' );
-				let textarea = document.getElementById('address');
+				
 
-				if ( ! textarea )
+				if ( ! addressInput )
 					break;
 
-				setTimeout( function() { textarea.focus(); }, 100 );
-				textarea.onFocus = geolocate();
+				setTimeout( function() { addressInput.focus(); }, 100 );
+				addressInput.onFocus = geolocate();
 
 				break;
 			
 			case 'cancel-add-new':
-				modal.classList.remove( 'not-empty' );
+				modal.classList.remove( 'not-empty', 'map--fetched' );
+				addressInput.value = '';
+				currentAddress.classList.add('none');
+				currentAddress.textContent = defaultState;
 				break;
-
 		}
 	});
 
+
+	window.addEventListener( 'addressUpdated', (e) => {
+		// update map, don't bubble
+		window.dispatchEvent(new Event('resize'));
+		modal.classList.add('map--fetched');
+		currentAddress.classList.remove('none');
+		currentAddress.textContent = addressInput.value;
+	});
 });
 
 function initTags( el ) {
@@ -122,8 +139,7 @@ function initAutocomplete() {
 
 
 function fillInAddress() {
-	window.dispatchEvent(new Event('resize'));
-	console.log( 'changed' );
+	window.dispatchEvent(new Event('addressUpdated'));
   // Get the place details from the autocomplete object.
   var place = autocomplete.getPlace();
 

@@ -24,6 +24,7 @@
 		top: calc( 50% + #{$actionButHeight} );
 		left: 50%;
 		transform: translate( -50%, -50% );
+		transition: left .15s ease-in-out;
 	}
 
 	&__title {
@@ -93,7 +94,12 @@
 			}
 
 			&__map {
-				size: 300px;
+				position: absolute;
+				width: calc( 100% - 500px );
+				right: -100%;
+				top: 250px;
+				bottom: 0;
+				transition: right .15s ease-in-out;
 
 				#map {
 					size: 100%;
