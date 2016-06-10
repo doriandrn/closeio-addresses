@@ -1,0 +1,10 @@
+.address {
+	&__current {
+		display: block;
+		margin-bottom: 40px;
+
+		&.none {
+			color: rgba( black, .5 );
+		}
+	}
+}
