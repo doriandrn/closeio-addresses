@@ -8,6 +8,16 @@
 		}
 	}
 
+	&__counter {
+		font-size: 16px;
+		margin-left: 20px;
+		color: rgba( black, .5 );
+	}
+
+	&__actions {
+		display: none;
+	}
+
 	&__tags {
 		@include reset-list;
 		display: block;

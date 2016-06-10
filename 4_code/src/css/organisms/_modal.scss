@@ -8,15 +8,13 @@
 
 	&__form,
 	&__cancel {
-		opacity: 0;
-		visibility: hidden;
-		max-height: 0;
-		overflow: hidden;
+		@include vHide;
 	}
 
 	&__header {
 		display: block;
 		position: static;
+		height: 200px;
 	}
 
 	&__content {
@@ -34,6 +32,10 @@
 		transform: translate( -50%, -50% );
 
 		transition: all .15s ease-in-out;
+	}
+
+	&__action {
+		@include vShow;
 	}
 
 	&__close {
@@ -71,11 +73,8 @@
 
 			&__form,
 			&__cancel {
-				opacity: 1;
-				visibility: visible;
-				max-height: 1000px;
+				@include vShow;
 				margin-bottom: 30px;
-				overflow: visible;
 			}
 
 			&__cancel {
@@ -90,7 +89,7 @@
 			}
 
 			&__action {
-				display: none;
+				@include vHide;
 			}
 
 			&__map {

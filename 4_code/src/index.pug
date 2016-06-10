@@ -7,10 +7,16 @@ html
 			.modal__header
 				button.modal__close.close Close
 				.modal__title
-					h1 Address
+					h1 Address#[span.suffix es]
+						span.address__counter 1/1
 					p.address__current.none None found for this lead.
+					.address__actions
+						button.button.button__small.address__edit(data-content="Edit Address" data-action="edit")
+						button.button.button__small.address__remove(data-content="Remove Address" data-action="remove")
+						button.button.button__small.button__color.address__new(data-action="add-new") Add New
+
 			.modal__content
-				button.modal__action.button.button__large.button__color(data-action="add-new") Add New
+				button.modal__action.button.button__large.button__color.address__new(data-action="add-new") Add New
 				form.form.form--nojs.modal__form(autocomplete="off")
 					.form__row
 						select.form__select.address__tags
@@ -31,7 +37,7 @@ html
 						.form__row
 							input#country(type="text" placeholder="Country")
 					.form__submit
-						input.button.button__large.button__color(type="submit" value="Save")
+						input.button.button__large.button__color(type="submit" value="Save" data-action="save")
 				.modal__cancel
 					button(data-action="cancel-add-new") Cancel
 			.modal__map

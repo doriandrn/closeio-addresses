@@ -35,8 +35,10 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 
 	modal.addEventListener( 'click', ( event ) => {
 
-		if ( event.target.tagName !== 'BUTTON' )
+		if ( event.target.tagName !== 'BUTTON' && event.target.dataset.action === undefined )
 			return;
+
+		event.preventDefault();
 
 		let button = event.target;
 		let buttonAction = button.dataset.action;
@@ -59,6 +61,10 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 				addressInput.value = '';
 				currentAddress.classList.add('none');
 				currentAddress.textContent = defaultState;
+				break;
+
+			case 'save':
+				console.log( componentForm );
 				break;
 		}
 	});
@@ -109,10 +115,8 @@ function initTags( el ) {
 
 		let tag = makeUl.appendChild( tagLi );
 	}
-
-	console.log( tags );
 	
-	tagSelect.remove();
+	tagSelect.style.display = 'none';
 }
 
 function initAutocomplete() {
