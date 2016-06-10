@@ -80,6 +80,14 @@
 			&__action {
 				display: none;
 			}
+
+			&__map {
+				size: 300px;
+
+				#map {
+					size: 100%;
+				}
+			}
 		}
 	}
 }
