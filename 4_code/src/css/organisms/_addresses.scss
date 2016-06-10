@@ -7,4 +7,14 @@
 			color: rgba( black, .5 );
 		}
 	}
+
+	&__tags {
+		display: block;
+		margin-bottom: 30px;
+	}
+
+	&__textarea {
+		min-height: 100px;
+		margin-bottom: 50px;
+	}
 }

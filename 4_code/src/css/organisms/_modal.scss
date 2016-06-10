@@ -1,24 +1,82 @@
 .modal {
+	$actionButHeight: 40px;
+
 	text-align: center;
 	position: relative;
 	padding: 50px;
 	height: 100%;
 
+	&__form {
+		opacity: 0;
+		visibility: hidden;
+		max-height: 0;
+		overflow: hidden;
+	}
+
 	&__header {
 		display: block;
-		position: relative;
+		position: static;
 	}
 
 	&__content {
 		position: absolute;
-		top: 50%;
+		top: calc( 50% + #{$actionButHeight} );
 		left: 50%;
 		transform: translate( -50%, -50% );
 	}
 
+	&__title {
+		position: absolute;
+		top: calc( 50% - #{$actionButHeight} );
+		left: 50%;
+		transform: translate( -50%, -50% );
+
+		transition: all .15s ease-in-out;
+	}
+
 	&__close {
-		position: fixed;
-		right: 100px;
-		top: 100px;
+		$closeSize: 32px;
+		$closePos:	60px;
+
+		position: fixed $closePos $closePos auto auto;
+		size: $closeSize;
+		line-height: $closeSize - 2px;
+		box-shadow: none;
+		padding: 0;
+		border: 1px solid rgba( black, .1 );
+		font-size: 0;
+		color: rgba( black, .25 );
+		overflow: hidden;
+
+		&:hover {
+			background: rgba( black, .05 );
+			color: rgba( black, .5 );
+		}
+
+		&:before {
+			content: 'x';
+			font-size: 12px;
+			display: block;
+		}
+	}
+
+	&.not-empty {
+		.modal {
+			&__title {
+				transform: translate( -50%, 0 );
+				top: 100px;
+			}
+
+			&__form {
+				opacity: 1;
+				visibility: visible;
+				max-height: 1000px;
+			}
+
+			&__action {
+				opacity: 0;
+				visibility: hidden;
+			}
+		}
 	}
 }

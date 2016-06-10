@@ -32,7 +32,14 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        loader: 'babel!eslint',
+        loader: 'babel',
+        query: {
+          presets: ['es2015']
+          // stage: 0,
+          // cacheDirectory: false,
+          // externalHelpers: true,
+          // plugins: ['transform-runtime'],
+        },
         exclude: /node_modules/
       },
       {

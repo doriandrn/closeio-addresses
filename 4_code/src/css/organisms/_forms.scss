@@ -4,4 +4,13 @@
 	&__address {
 		display: none;
 	}
+
+	&__row {
+		display: block;
+
+		input[type=text],
+		textarea {
+			width: 100%;
+		}
+	}
 }
