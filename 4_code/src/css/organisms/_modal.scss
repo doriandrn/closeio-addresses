@@ -77,6 +77,17 @@
 				overflow: visible;
 			}
 
+			&__cancel {
+				> button {
+					color: rgba( black, .25 );
+					transition: color .15s ease-in-out;
+
+					&:hover {
+						color: rgba( black, .75 );
+					}
+				}
+			}
+
 			&__action {
 				display: none;
 			}

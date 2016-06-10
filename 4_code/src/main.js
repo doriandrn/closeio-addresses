@@ -105,7 +105,8 @@ function initAutocomplete() {
 
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: -33.8688, lng: 151.2195},
-    zoom: 13
+    zoom: 8,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
   });
 
   autocomplete.bindTo('bounds', map);
@@ -120,10 +121,9 @@ function initAutocomplete() {
 }
 
 
-
-
 function fillInAddress() {
 	window.dispatchEvent(new Event('resize'));
+	console.log( 'changed' );
   // Get the place details from the autocomplete object.
   var place = autocomplete.getPlace();
 
@@ -151,7 +151,7 @@ function fillInAddress() {
     map.fitBounds(place.geometry.viewport);
   } else {
     map.setCenter(place.geometry.location);
-    map.setZoom(17);  // Why 17? Because it looks good.
+    map.setZoom(8);
   }
 
   marker.setIcon(/** @type {google.maps.Icon} */({
