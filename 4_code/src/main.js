@@ -1,5 +1,4 @@
 require('./style.scss');
-// let backbone = require('backbone');
 
 let 
 	placeSearch, 
@@ -22,6 +21,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 	}
 
 	initTags( modal );
+	initAutocomplete();
 
 	modal.addEventListener( 'click', ( event ) => {
 
