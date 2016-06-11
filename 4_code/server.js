@@ -1,64 +1,119 @@
-const express       = require('express')
-const MongoClient 	= require('mongodb').MongoClient
-const bodyParser    = require('body-parser')
-const webpack       = require('webpack')
-const config        = require('./build/webpack.dev.conf')
-const _             = require('lodash')
-const fs            = require('fs')
-const pug           = require('pug')
+const koa           = require('koa')
+const koaBody       = require('koa-body');
+const Pug           = require('koa-pug')
+const app           = koa()
+const router        = require('koa-router')()
+const MongoClient   = require('mongodb').MongoClient
 
-const app           = express()
-const router        = express.Router()
-const compiler      = webpack(config)
-const jsonParser    = bodyParser.json()
-var db
+var db, updResults
 
 // Establish connection first
 MongoClient.connect('mongodb://dorian:dorian22@ds041432.mlab.com:41432/closeio_addresses', (err, database) => {
   if (err) 
-  	return console.log(err)
+    return console.log(err)
   db = database
+});
+
+const pug = new Pug({
+  viewPath: './src',
+  debug: false,
+  pretty: false,
+  compileDebug: false,
+  // locals: global_locals_for_all_pages,
+  basedir: './src',
+  app: app // equals to pug.use(app) and app.use(pug.middleware)
 })
+
+pug.locals.someKey = 'some value'
+
+app.use(function* () {
+  this.render('index', {title: 'fml'}, true)
+})
+
+router.post('/addresses', koaBody,
+  function *(next) {
+    console.log(this.request.body);
+    
+    // this.body = JSON.stringify(this.request.body);
+  }
+);
+
+app.listen(3000);
 
 // handle fallback for HTML5 history API
-app.use(require('connect-history-api-fallback')())
-app.use(bodyParser.urlencoded({extended: true}))
+// app.use(morgan('combined'))
+// app.use(require('connect-history-api-fallback')())
+// app.use(bodyParser.urlencoded({extended: true}))
 
-app.set('views', './src')
-app.set('view engine', 'pug')
+// app.set('views', './src')
+// app.set('view engine', 'pug')
 
-// serve webpack bundle output
-app.use(require('webpack-dev-middleware')(compiler, {
-  publicPath: config.output.publicPath,
-  stats: {
-    colors: true,
-    chunks: false
-  }
-}))
+// const isDeveloping = process.env.NODE_ENV !== 'production';
+// const port = isDeveloping ? 3000 : process.env.PORT;
 
-app.use(require('webpack-hot-middleware')(compiler))
+// if (isDeveloping) {
+//   const compiler = webpack(config);
+//   const middleware = webpackMiddleware(compiler, {
+//     publicPath: config.output.publicPath,
+//     stats: {
+//       colors: true,
+//       hash: true,
+//       timings: true,
+//       chunks: false,
+//       chunkModules: false,
+//       modules: false
+//     }
+//   });
 
-router.post('/addresses', (req,res) => {
-	db.collection('addresses').save(req.body, (err, result) => {
-    if (err) return console.log(err)
+//   app.use(historyApiFallback({verbose: false}));
 
-    console.log('saved to database')
-    res.render('index', db.collection('addresses').find().toArray(function(err, results) {
-			console.log('st baiat')
-		}))
-  })
-}) 
+//   app.use(middleware);
+//   app.use(webpackHotMiddleware(compiler));
 
-router.get('/', (req, res) => {
-  
-})
+//   app.get('/', function response(req, res) {
+//     console.log('servicm');
+//     res.send(middleware.fileSystem.readFileSync(path.join(__dirname, '/dist/index.html')));
+//   });
+// } else {
+//   app.use(express.static(__dirname + '/dist'));
+//   app.get('*', function response(req, res) {
+//     res.sendFile(path.join(__dirname, 'dist/index.html'));
+//   });
+// }
+
+// app.get('/', (req, res) => {
+//   console.log('HOME');
+// });
+
+// app.get('/addresses', (req, res) => {
+//   console.log('ecf')
+//   res.render('index', {
+//      title: 'title' 
+//    })
+//   db.collection('addresses').find().toArray( (err, results) => {
+//     if (err) return console.log(err)
+//     console.log( results );
+    
+//   })
+// })
+
+// router.post('/addresses', (req,res) => {
+//   db.collection('addresses').save(req.body, (err, result) => {
+//     if (err) return console.log(err)
+
+//     console.log('Added new address!')
+
+//     res.redirect('/addresses')
+//   })
+// }) 
 
 
-app.use('/', router)
 
-app.listen(8090, () => {
-  console.log('Listening at http://localhost:8090')
-})
+// app.use('/api', router)
+
+// app.listen(port, () => {
+//   console.log('Listening at http://localhost:'+port)
+// })
 
 
 

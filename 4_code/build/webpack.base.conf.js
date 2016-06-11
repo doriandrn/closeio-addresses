@@ -12,7 +12,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, '../dist'),
-    publicPath: '',
+    publicPath: 'http://localhost:3000',
     filename: '[name].js'
   },
   resolve: {
