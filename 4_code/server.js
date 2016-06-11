@@ -3,16 +3,18 @@ const koaBody       = require('koa-body');
 const Pug           = require('koa-pug')
 const app           = koa()
 const router        = require('koa-router')()
-const MongoClient   = require('mongodb').MongoClient
+const mongo         = require('koa-mongo');
+// const MongoClient   = require('mongodb').MongoClient
 
-var db, updResults
+// var db = db || {}, updResults
 
 // Establish connection first
-MongoClient.connect('mongodb://dorian:dorian22@ds041432.mlab.com:41432/closeio_addresses', (err, database) => {
-  if (err) 
-    return console.log(err)
-  db = database
-});
+// MongoClient.connect('mongodb://dorian:dorian22@ds041432.mlab.com:41432/closeio_addresses', (err, database) => {
+//   if (err) 
+//     return console.log(err)
+//   console.log( database )
+//   db = database
+// });
 
 const pug = new Pug({
   viewPath: './src',
@@ -24,19 +26,34 @@ const pug = new Pug({
   app: app // equals to pug.use(app) and app.use(pug.middleware)
 })
 
-pug.locals.someKey = 'some value'
+app.use(mongo({
+  uri: 'mongodb://dorian:dorian22@ds041432.mlab.com:41432/closeio_addresses',
+  max: 100,
+  min: 1,
+  timeout: 30000,
+  log: false
+}));
 
-app.use(function* () {
-  this.render('index', {title: 'fml'}, true)
-})
 
-router.post('/addresses', koaBody,
-  function *(next) {
-    console.log(this.request.body);
+pug.locals.fetchx = 'luv'
+
+app.use(function* (next) {
+  this.mongo.db('closeio_addresses').collection('addresses').findOne({}, function (err, doc) {
+    // console.log(doc);
+  });
+
+  var addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
+  this.render('index', {title: 'fml', addresses: addresses }, true)
+});
+
+
+// router.post('/addresses', koaBody,
+//   function *(next) {
+//     console.log(this.request.body);
     
-    // this.body = JSON.stringify(this.request.body);
-  }
-);
+//     // this.body = JSON.stringify(this.request.body);
+//   }
+// );
 
 app.listen(3000);
 

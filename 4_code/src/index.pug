@@ -2,15 +2,13 @@ doctype html
 html
 	head
 		script(src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLG_boiHX2rtGQApI2UJ5zpbELKcrD6JY&libraries=places" type="text/javascript")
-		-console.log('loaded')
-		-console.log( locals )
 	body
 		div.modal.modal__address.address
 			.modal__header=title
 				button.button.modal__close.close(data-action="dismiss_modal") Close
 				.modal__title
 					h1 Address#[span.suffix es]
-						span.address__counter 1/1
+						span.address__counter 1/#{addresses.length}
 					p.address__current.none None found for this lead.
 					.address__actions
 						button.button.button__small.address__edit(data-content="Edit Address" data-action="edit")
