@@ -38,12 +38,16 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 		if ( event.target.tagName !== 'BUTTON' && event.target.dataset.action === undefined )
 			return;
 
-		event.preventDefault();
+		// event.preventDefault();
 
 		let button = event.target;
 		let buttonAction = button.dataset.action;
 
 		switch( buttonAction ) {
+			case 'dismiss_modal':
+				console.log('Modal should have closed...');
+				break;
+
 			case 'add-new':
 				modal.classList.add( 'not-empty' );
 				

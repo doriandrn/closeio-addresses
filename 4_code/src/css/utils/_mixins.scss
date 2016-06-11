@@ -18,3 +18,19 @@
 	max-height: 1000px;
 	overflow: visible;
 }
+
+// Media Queries
+//
+// Allows you to use inline media queries. Includes options for `$fix-mqs`.
+//
+// $breakpoint - Desired breakpoint. Can be variable or unit.
+// $query - Defaults to `min-width`.
+// $type - Defaults to `screen`.
+
+@mixin mq($breakpoint, $query: 'min-width', $type: 'screen') {
+  @if $fix-mqs {
+    @if $fix-mqs >= $breakpoint { @content; }
+  } @else {
+    @media #{$type} and (#{$query}: #{$breakpoint}) { @content; }
+  }
+}
