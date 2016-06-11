@@ -64,7 +64,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 				break;
 
 			case 'save':
-				console.log( componentForm );
+				console.dir( componentForm );
 				break;
 		}
 	});

@@ -17,25 +17,25 @@ html
 
 			.modal__content
 				button.modal__action.button.button__large.button__color.address__new(data-action="add-new") Add New
-				form.form.form--nojs.modal__form(autocomplete="off")
+				form.form.form--nojs.modal__form(method="post" autocomplete="off")
 					.form__row
 						select.form__select.address__tags
 							option.form__select__option(value='business' data-color='#015F9B' selected) Business
 							option.form__select__option(value='mailing' data-color='#DA00F8') Mailing
 							option.form__select__option(value='other') Other
 					.form__row
-						input#address.address__textarea(type="text" autofocus placeholder="Enter your address...")
+						input#address.address__textarea(type="text" name="address" autofocus placeholder="Enter your address...")
 					fieldset.form__address
 						.form__row
-							input#street_number(type="text" placeholder="Address")
-							input#route(type="text" placeholder="Address (cont.)")
+							input#street_number(type="text" placeholder="Address" name="street_number")
+							input#route(type="text" placeholder="Address (cont.)" name="route")
 						.form__row
-							input#locality(type="text" placeholder="City")
-							input#administrative_area_level_1(type="text" placeholder="State")
+							input#locality(type="text" placeholder="City" name="locality")
+							input#administrative_area_level_1(type="text" placeholder="State" name="administrative_area_level_1")
 						.form__row
-							input#postal_code(type="text" placeholder="Postal Code")
+							input#postal_code(type="text" placeholder="Postal Code" name="postal_code")
 						.form__row
-							input#country(type="text" placeholder="Country")
+							input#country(type="text" placeholder="Country" name="country")
 					.form__submit
 						input.button.button__large.button__color(type="submit" value="Save" data-action="save")
 				.modal__cancel
