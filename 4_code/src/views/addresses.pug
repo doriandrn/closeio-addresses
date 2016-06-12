@@ -1,12 +1,13 @@
-extends principal
+extends ../principal
+
 block addresses
-	// - console.log(addresses)
 	.modal__header
 		button.button.modal__close.close(data-action="dismiss_modal") Close
 		.modal__title
 			h1 Address
-				span.suffix es
-				span.address__counter 1/#{ addresses.length }
+				if addresses.length > 1
+					span.suffix es
+					span.address__counter 1/#{ addresses ? addresses.length : 0}
 			p.address__current.none None found for this lead.
 			.address__actions
 				button.button.button__small.address__edit(data-content="Edit Address" data-action="edit")

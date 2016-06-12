@@ -1,0 +1,35 @@
+- addresses = addresses || {}
+//- - console.log(addresses)
+- path = path + '/' || ''
+
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="x-ua-compatible", content="ie=edge")
+
+    // #DNS prefetching
+    link(rel="dns-prefetch", href="//ajax.googleapis.com")
+    link(rel="dns-prefetch", href="//use.typekit.net")
+    link(rel="dns-prefetch", href="//google-analytics.com")
+
+    // #Asset Prefetching - Fetch and download assets before requested by the user
+    link(rel="dns-prefetch", href="")
+
+    // #Page Prefetching
+    link(rel="prefetch" href="index.html")
+
+    // #Typekit
+    title CloseIo Addresses Modal
+
+    meta(name='description', content='')
+    meta(name='robots', content='all')
+
+    meta(name='viewport', content='width=device-width, user-scalable=1, initial-scale=1, maximum-scale=1')
+    meta(name='apple-mobile-web-app-capable', content='yes')
+
+    script(src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLG_boiHX2rtGQApI2UJ5zpbELKcrD6JY&libraries=places" type="text/javascript")
+
+  body
+    div.modal.modal__address.address
+      block addresses

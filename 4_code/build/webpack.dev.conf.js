@@ -18,10 +18,12 @@ var polyfill = 'eventsource-polyfill'
 // necessary for the html plugin to work properly
 // when serving the html from in-memory
 config.output.publicPath = '/'
-// config.output.path = '/'
+config.output.path = '/'
+
 
 config.plugins = (config.plugins || []).concat([
-  new ExtractTextPlugin('[name].[contenthash].css'),
+  new ExtractTextPlugin('[name].css'),
+  // new ExtractTextPlugin('[name].css'),
   new webpack.optimize.OccurenceOrderPlugin(),
   new webpack.NoErrorsPlugin(),
   new HtmlWebpackPlugin({
