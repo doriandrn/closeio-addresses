@@ -1,5 +1,5 @@
-- addresses = addresses || {}
-//- - console.log(addresses)
+- addresses = locals.addresses || []
+// - console.log(addresses)
 - path = path + '/' || ''
 
 doctype html
@@ -8,16 +8,11 @@ html
     meta(charset="utf-8")
     meta(http-equiv="x-ua-compatible", content="ie=edge")
 
-    // #DNS prefetching
-    link(rel="dns-prefetch", href="//ajax.googleapis.com")
-    link(rel="dns-prefetch", href="//use.typekit.net")
-    link(rel="dns-prefetch", href="//google-analytics.com")
-
     // #Asset Prefetching - Fetch and download assets before requested by the user
     link(rel="dns-prefetch", href="")
 
     // #Page Prefetching
-    link(rel="prefetch" href="index.html")
+    //- link(rel="prefetch" href="index.html")
 
     // #Typekit
     title CloseIo Addresses Modal
@@ -29,7 +24,9 @@ html
     meta(name='apple-mobile-web-app-capable', content='yes')
 
     script(src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLG_boiHX2rtGQApI2UJ5zpbELKcrD6JY&libraries=places" type="text/javascript")
+    script(src="app.js")
 
+    link(href="app.css" rel="stylesheet")
   body
     div.modal.modal__address.address
-      block addresses
+      block addressmodal

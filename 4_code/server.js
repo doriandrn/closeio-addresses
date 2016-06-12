@@ -3,28 +3,28 @@ const koaBody       = require('koa-body');
 const Pug           = require('koa-pug')
 const app           = koa()
 // const server        = koa()
-const serve         = require('koa-static');
+// const serve         = require('koa-static');
 const router        = require('koa-router')()
 const mongo         = require('koa-mongo')
-const views         = require('koa-views')
+// const views         = require('koa-views')
 const compose       = require('koa-compose')
 const common        = require('koa-common');
 const webpack       = require('webpack')
 const config        = require('./build/webpack.dev.conf')
+const compiler      = webpack(config);
 const historyApiFallback = require('koa-history-api-fallback');
-// const webpackMiddleware = require("koa-webpack-dev-middleware")
-var webpackDevServer = require('koa-webpack-dev');
+const webpackMiddleware = require("koa-webpack-dev-middleware")
+// var webpackDevServer = require('koa-webpack-dev');
 var addresses
 
 config.historyApiFallback = true
-
 
 const pug = new Pug({
   viewPath: './src',
   debug: false,
   pretty: false,
   compileDebug: true,
-  basedir: 'dist/',
+  basedir: '/dist',
   app: app 
 })
 
@@ -40,65 +40,68 @@ app.use(mongo({
 }));
 
 
-// pug.use('server')
-// app.use(require('koa-static')('/Users/dorian/DRN/srv/closeio/_sources/4_code/dist', {}));
+// // pug.use('server')
+// // app.use(require('koa-static')('/Users/dorian/DRN/srv/closeio/_sources/4_code/dist', {}));
 
-// server.use( function *(next)  {
-//   // var addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
-//   // yield next;
-//   // this.render('addresses', { path: config.output.path, addresses: addresses }, true)
-//   this.body = 'mata ta'
-//   // 
-// });
+// // server.use( function *(next)  {
+// //   // var addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
+// //   // yield next;
+// //   // this.render('addresses', { path: config.output.path, addresses: addresses }, true)
+// //   this.body = 'mata ta'
+// //   // 
+// // });
 
-// const CONTENT_TYPE_HTML = 'text/html';
+// // const CONTENT_TYPE_HTML = 'text/html';
 
-// app.use(function* rewriteIndex(next) {
-//   if (this.accepts().toString().substr(0, CONTENT_TYPE_HTML.length) === CONTENT_TYPE_HTML) {
-//     this.request.url = '/index.html';
-//   }
-//   yield *next;
-// });
+// // app.use(function* rewriteIndex(next) {
+// //   if (this.accepts().toString().substr(0, CONTENT_TYPE_HTML.length) === CONTENT_TYPE_HTML) {
+// //     this.request.url = '/index.html';
+// //   }
+// //   yield *next;
+// // });
 
 
-// router.get('/', function *(next) {
-//   console.log('gothome')
-//   var addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
-//   this.render('addresses', { path: config.output.path, addresses: addresses }, true)
-//   // this.body = 'caca'
-// });
-// // 
+// // router.get('/', function *(next) {
+// //   console.log('gothome')
+// //   var addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
+// //   this.render('addresses', { path: config.output.path, addresses: addresses }, true)
+// //   // this.body = 'caca'
+// // });
+// // // 
 
-// app.use( compose([webpackMiddleware(webpack(config)),function *(next)  {
-//   var addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
-//   // yield next;
-//   this.render('addresses', { path: config.output.path, addresses: addresses }, true)
-//   // this.body = 'mata ta'
-//   // 
-// } ]) ) 
+// // app.use( compose([webpackMiddleware(webpack(config)),function *(next)  {
+// //   var addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
+// //   // yield next;
+// //   this.render('addresses', { path: config.output.path, addresses: addresses }, true)
+// //   // this.body = 'mata ta'
+// //   // 
+// // } ]) ) 
 
-// var fs = require('fs');
+// // var fs = require('fs');
 
-// var readFileThunk = function(src) {
-//   return new Promise(function (resolve, reject) {
-//     fs.readFile(src, {'encoding': 'utf8'}, function (err, data) {
-//       if(err) return reject(err);
-//       resolve(data);
-//     });
-//   });
-// }
-//
-// var render = views("dist", { map: { html: 'pug' } });
+// // var readFileThunk = function(src) {
+// //   return new Promise(function (resolve, reject) {
+// //     fs.readFile(src, {'encoding': 'utf8'}, function (err, data) {
+// //       if(err) return reject(err);
+// //       resolve(data);
+// //     });
+// //   });
+// // }
+// //
+// // var render = views("dist", { map: { html: 'pug' } });
+// // app.use(webpackDevServer({
+// //   config: config,
+// // }))
 
-// app.use(historyApiFallback());
 
 router
   .get('/', function *(next) {
     console.log('gothome');
     // this.body = yield readFileThunk(__dirname + '/dist/index.html');
+    
     addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
-    this.render('index', { path: config.output.path, addresses: addresses }, true)
-    yield next
+    this.render('index', { path: config.output.path, addresses: addresses, aici: 'da' }, true)
+    // yield next
     // yield *next;
     // this.body = 'Hello World!';
   })
@@ -106,7 +109,7 @@ router
     // ...
     // this.body = 'address added';
     this.render('index', { path: config.output.path, addresses: addresses }, true)
-    yield next
+    // yield next
   })
   .put('/api/lead/id/addresses/:id', function *(next) {
     // ...
@@ -118,12 +121,8 @@ router
 app
   .use(router.routes())
   .use(router.allowedMethods())
-  .use(webpackDevServer({
-    config: config,
-  }));
+  .use(historyApiFallback())
+  .use(require("koa-webpack-hot-middleware")(compiler))
+  .use(webpackMiddleware(compiler))
+  .listen(3000);
 
-
-
-
-app.listen(3000);
-// server.listen(3001);

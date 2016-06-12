@@ -5,7 +5,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 
 // naming output files with hashes for better caching.
 // dist/index.html will be auto-generated with correct URLs.
-config.output.filename = '[name].[chunkhash].js'
+config.output.filename = '[name].js'
 config.output.chunkFilename = '[id].[chunkhash].js'
 
 var SOURCE_MAP = true
@@ -21,7 +21,7 @@ function generateExtractLoaders (loaders) {
 
 config.plugins = (config.plugins || []).concat([
   new webpack.optimize.OccurenceOrderPlugin(),
-  new ExtractTextPlugin('[name].[contenthash].css'),
+  new ExtractTextPlugin('[name].css'),
   new webpack.DefinePlugin({
     'process.env': {
       NODE_ENV: '"production"'
