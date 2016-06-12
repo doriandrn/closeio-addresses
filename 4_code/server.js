@@ -1,5 +1,5 @@
 const koa           = require('koa')
-const koaBody       = require('koa-body');
+const koaBody       = require('koa-body')()
 const Pug           = require('koa-pug')
 const app           = koa()
 // const server        = koa()
@@ -105,10 +105,17 @@ router
     // yield *next;
     // this.body = 'Hello World!';
   })
-  .post('/api/lead/id/addresses', function *(next) {
+  .post('/api/lead/id/addresses', koaBody, function *(next) {
+    console.log(koaBody);
+    this.mongo.db('closeio_addresses').collection('addresses').save(this.request.body, (err, result) => {
+      if (err) 
+        return console.log(err)
+      console.log('Added new address!')
+    })
+    this.redirect('/')
     // ...
     // this.body = 'address added';
-    this.render('index', { path: config.output.path, addresses: addresses }, true)
+    // this.render('index', { path: config.output.path, addresses: addresses }, true)
     // yield next
   })
   .put('/api/lead/id/addresses/:id', function *(next) {
