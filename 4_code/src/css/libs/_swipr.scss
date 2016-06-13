@@ -25,18 +25,30 @@
         &-next {
             &.button {
                 position: absolute;
-                size: 34px;
+                size: 32px;
+                line-height: 30px;
                 top: 50%;
                 transform: translateY( -50% );
                 display: block;
+
+                &:before {
+                    display: block;
+                    font-size: 12px;
+                }
             }
         }
 
         &-prev {
+            &:before {
+                content: '<';
+            }
             left: 0
         }
 
         &-next {
+            &:before {
+                content: '>';
+            }
             right: 0
         }
     }

@@ -1,9 +1,11 @@
 let 
+	modal,
 	placeSearch, 
 	autocomplete,
 	map,
 	marker,
 	infowindow,
+	addressFormModel,
 	addressesEl,
 	addressInput,
 	currentAddress,
@@ -19,20 +21,9 @@ let
 	swiper = require('swiper');
 
 
-class CloseIo {
-	constructor( settings = {} ) {
-
-	}
-	static get map() {
-
-	}
-	static get modal() {
-	}
-}
-
 
 document.addEventListener( 'DOMContentLoaded', ( event ) => {
-	let modal = event.target.querySelector('.modal__address');
+	modal = event.target.querySelector('.modal__address');
 
 	if ( ! modal ) {
 		console.error( 'Something is really wrong here. Address Modal could not be located.' );
@@ -43,33 +34,33 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 	currentAddress = modal.querySelector('.address__current');
 	addressInput = document.getElementById('address');
 
-	let defaultState = currentAddress.textContent;
+	let counter = modal.querySelector('.address__counter .counter'),
+			totalCounter = modal.querySelector('.address__counter .total-counter');
+	
+	// let defaultState = currentAddress.textContent;
 
 	initTags( modal );
 	initAutocomplete();
 
 	let Slider = new Swiper('.swiper-container', {
-    // Optional parameters
     direction: 'horizontal',
     loop: false,
-    
-    // If we need pagination
     pagination: '.swiper-pagination',
-    
-    // Navigation arrows
     nextButton: '.swiper-button-next',
     prevButton: '.swiper-button-prev',
-
     a11y: true,
-
+    onInit: ( swiper ) => {
+    	addressFormModel = updateAFModel( modal );
+    },
+    onSlideChangeStart: function( swiper ) {
+    	counter.textContent = swiper.activeIndex + 1;
+    	addressFormModel = updateAFModel( modal );
+    },
     onSlideChangeEnd: function( swiper ) {
-    	console.log( swiper.activeIndex );
+    	// update FormS URL
+    	// update map -- move to marker
     }
-
   });
-
-  console.log( Slider.activeIndex );
-
 
 	modal.addEventListener( 'click', ( event ) => {
 
@@ -91,21 +82,17 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 				if ( ! addressInput )
 					break;
 
+				totalCounter.textContent = parseInt( totalCounter.textContent ) + 1;
+				Slider.prependSlide([
+					'<div class="swiper-slide"><address>Adding New</address></div>'
+				]);
+				Slider.slideTo(0);
+				
 				modal.classList.remove( 'map--fetched', 'map--fetched--full' );
 
 				if ( ! modal.classList.contains( 'not-empty' ) )
 					modal.classList.add( 'not-empty' );
 				
-				if ( currentAddress.classList.length > 0 ) {
-					_.each( currentAddress.classList, function(n) {
-						if ( typeof n == 'string' && n.indexOf('tag--') > -1 ) {
-							backupClass = n;
-							currentAddress.classList.remove(n);
-						}
-					});
-				}
-
-				currentAddress.textContent = "Adding New...";
 
 				setTimeout( function() { addressInput.focus(); }, 100 );
 				addressInput.onFocus = geolocate();
@@ -113,20 +100,26 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 			
 			case 'cancel-add-new':
 				modal.classList.remove( 'not-empty', 'map--fetched' );
+				Slider.removeSlide(0);
+				Slider.slideTo(0);
+
+				totalCounter.textContent = parseInt( totalCounter.textContent ) - 1;
 				addressInput.value = '';
-				currentAddress.classList.add( backupClass );
-				currentAddress.textContent = defaultState;
 				break;
 
 			case 'edit':
 				modal.classList.remove( 'map--fetched--full' );
 				modal.classList.add( 'map--fetched' );
+				let form = modal.querySelector('form.modal__form');
+				console.log( form );
+				_.each( addressFormModel, ( value, key ) => {
+					let field = modal.querySelector('input[name='+key+']');
+					if ( field )
+						field.value = value;
+				});
 				break;
 
 			case 'remove':
-				event.preventDefault();
-				let confirmRemove = confirm('Are you sure you want to remove this address?');
-				
 				break;
 
 			case 'switch--tag':
@@ -316,6 +309,19 @@ function geolocate() {
       autocomplete.setBounds(circle.getBounds());
     });
   }
+}
+
+function updateAFModel( q ) {
+	let AFModel = {};
+	let selector = q.querySelector('.swiper-slide-active address');
+	if ( ! selector )
+		return {};
+	
+	_.each( selector.dataset, ( value, tag ) => {
+    AFModel[tag] = value;
+  });
+  AFModel['address'] = selector.textContent;
+	return AFModel;
 }
 
 require('./style.scss');

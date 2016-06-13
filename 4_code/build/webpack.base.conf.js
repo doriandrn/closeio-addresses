@@ -4,6 +4,7 @@ var path        = require('path'),
     magic       = require('postcss-magic-animations'),
     magician    = require('postcss-font-magician'),
     pxtorem     = require('postcss-pxtorem'),
+    postcssFontGrabber = require('postcss-font-grabber'),
     ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
@@ -35,10 +36,6 @@ module.exports = {
         loader: 'babel',
         query: {
           presets: ['es2015']
-          // stage: 0,
-          // cacheDirectory: false,
-          // externalHelpers: true,
-          // plugins: ['transform-runtime'],
         },
         exclude: /node_modules/
       },
@@ -47,24 +44,12 @@ module.exports = {
         loader: 'json'
       },
       {
-        test: /\.(png|jpg|gif|svg)$/,
-        loader: 'url',
-        query: {
-          limit: 10000,
-          name: '[name].[ext]?[hash:7]'
-        }
-      },
-      {
         test: /\.scss$/,
         loader: ExtractTextPlugin.extract( 'style', 'css!postcss!sass' )
       },
-      { 
-        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, 
-        loader: "url-loader?limit=10000&minetype=application/font-woff" 
-      },
-      { 
-        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, 
-        loader: "file-loader" 
+      {
+        test: /\.(svg|ttf|eot|woff|woff2)$/,
+        loader: 'file-loader'
       }
     ]
   },
@@ -83,23 +68,8 @@ module.exports = {
         short,
         magic({atRoot: true}),
         pxtorem({replace: false}),
-        magician({
-          closeioSymbols: {
-            'closeio-symbols': {
-              variants: {
-                400: {
-                  normal: {
-                    url: {
-                      woff: 'assets/fonts/closeio-symbols.woff',
-                      ttf:  'assets/fonts/closeio-symbols.ttf',
-                      svg:  'assets/fonts/closeio-symbols.svg',
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }),
+        magician,
+        postcssFontGrabber,
         ap //autoprefixer
       ]
     }
