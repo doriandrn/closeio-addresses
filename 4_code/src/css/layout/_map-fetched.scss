@@ -24,6 +24,12 @@
 					width: 100%;
 				}
 			}
+
+			.address {
+				&__actions {
+					@include vShow;
+				}
+			}
 		}
 	}
 }

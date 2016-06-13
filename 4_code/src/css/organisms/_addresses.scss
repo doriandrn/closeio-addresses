@@ -23,7 +23,7 @@
 	}
 
 	&__actions {
-		// display: none;
+		@include vHide;
 
 		> .button {
 			i {

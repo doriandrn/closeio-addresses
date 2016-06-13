@@ -39,8 +39,9 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 
 		// event.preventDefault();
 
-		let button = event.target;
-		let buttonAction = button.dataset.action;
+		let button = event.target,
+				buttonAction = button.dataset.action,
+				backupClass = 'none';
 
 		switch( buttonAction ) {
 			case 'dismiss_modal':
@@ -48,13 +49,24 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 				break;
 
 			case 'add-new':
+				if ( ! addressInput )
+					break;
+
 				modal.classList.remove( 'map--fetched', 'map--fetched--full' );
 
 				if ( ! modal.classList.contains( 'not-empty' ) )
 					modal.classList.add( 'not-empty' );
 				
-				if ( ! addressInput )
-					break;
+				if ( currentAddress.classList.length > 0 ) {
+					_.each( currentAddress.classList, function(n) {
+						if ( typeof n == 'string' && n.indexOf('tag--') > -1 ) {
+							backupClass = n;
+							currentAddress.classList.remove(n);
+						}
+					});
+				}
+
+				currentAddress.textContent = "Adding New...";
 
 				setTimeout( function() { addressInput.focus(); }, 100 );
 				addressInput.onFocus = geolocate();
@@ -63,7 +75,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 			case 'cancel-add-new':
 				modal.classList.remove( 'not-empty', 'map--fetched' );
 				addressInput.value = '';
-				currentAddress.classList.add('none');
+				currentAddress.classList.add( backupClass );
 				currentAddress.textContent = defaultState;
 				break;
 
