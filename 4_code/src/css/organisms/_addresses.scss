@@ -1,7 +1,10 @@
 .address {
-	&__current {
+	&es {
 		display: block;
 		margin-bottom: 40px;
+	}
+
+	&__current {
 		padding: 5px 20px;
     border-radius: 20px;
     font-size: 13px;

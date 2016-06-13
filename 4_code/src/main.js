@@ -4,6 +4,7 @@ let
 	map,
 	marker,
 	infowindow,
+	addressesEl,
 	addressInput,
 	currentAddress,
 	componentForm = {
@@ -14,7 +15,21 @@ let
 	  country: 'long_name',
 	  postal_code: 'short_name'
 	},
-	_ = require('lodash');
+	_ = require('lodash'),
+	swiper = require('swiper');
+
+
+class CloseIo {
+	constructor( settings = {} ) {
+
+	}
+	static get map() {
+
+	}
+	static get modal() {
+	}
+}
+
 
 document.addEventListener( 'DOMContentLoaded', ( event ) => {
 	let modal = event.target.querySelector('.modal__address');
@@ -24,6 +39,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 		return;
 	}
 
+	addressesEl = modal.querySelector('.addresses');
 	currentAddress = modal.querySelector('.address__current');
 	addressInput = document.getElementById('address');
 
@@ -31,6 +47,29 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 
 	initTags( modal );
 	initAutocomplete();
+
+	let Slider = new Swiper('.swiper-container', {
+    // Optional parameters
+    direction: 'horizontal',
+    loop: false,
+    
+    // If we need pagination
+    pagination: '.swiper-pagination',
+    
+    // Navigation arrows
+    nextButton: '.swiper-button-next',
+    prevButton: '.swiper-button-prev',
+
+    a11y: true,
+
+    onSlideChangeEnd: function( swiper ) {
+    	console.log( swiper.activeIndex );
+    }
+
+  });
+
+  console.log( Slider.activeIndex );
+
 
 	modal.addEventListener( 'click', ( event ) => {
 
@@ -80,7 +119,6 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 				break;
 
 			case 'edit':
-				console.log('editing');
 				modal.classList.remove( 'map--fetched--full' );
 				modal.classList.add( 'map--fetched' );
 				break;
@@ -142,16 +180,13 @@ function initTags( el ) {
 	tagsParent.insertBefore( makeUl, tagSelect );
 
 	for ( let i = 0; i < getTags.length; i+=1 ) {
-		// tags[getTags[i].value] = getTags[i].dataset.color !== undefined ? getTags[i].dataset.color : '#000000';
-		
+
 		let tagLi = document.createElement('li');
 		
 		tagLi.classList.add('address__tag', 'tag--' + getTags[i].value );
 		tagLi.textContent = getTags[i].textContent;
 		tagLi.dataset.value = getTags[i].value;
 		tagLi.dataset.action = 'switch--tag';
-		// tagLi.style.color = getTags[i].dataset.color;
-		// tagLi.style.backgroundColor = convertHex( getTags[i].dataset.color, 10 );
 
 		if ( getTags[i].selected ) {
 			tagLi.classList.add('active');
@@ -164,15 +199,39 @@ function initTags( el ) {
 }
 
 function initAutocomplete() {
-  autocomplete = new google.maps.places.Autocomplete(
-      (document.getElementById('address')),
-      {types: ['geocode']});
+  let geocoder = new google.maps.Geocoder(),
+  		initialState = false,
+  		addressInputVal = addressInput.value;
 
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: -33.8688, lng: 151.2195},
-    zoom: 8,
-    mapTypeId: google.maps.MapTypeId.ROADMAP
-  });
+  if ( addressInputVal.length > 1 ) {
+  	geocoder.geocode({ address: addressInputVal }, (results, status) => {
+  		if ( status === 'OK' ) {
+  			// console.log( results );
+ 				// initialState = new google.maps.LatLng( results[0].geometry.location.lat(), results[0].geometry.location.lng() )
+ 				initialState = results[0].geometry.location;
+ 				console.log( initialState );
+  		}
+  	});
+  }
+
+  let	map = document.getElementById('map'),
+  		maxZoom = 8,
+  		opts = {
+    		zoom: maxZoom,
+    		center: initialState[0],
+    		mapTypeId: google.maps.MapTypeId.ROADMAP
+  		};
+
+  console.dir( opts );
+
+  autocomplete = new google.maps.places.Autocomplete( ( document.getElementById( 'address' ) ), {types: ['geocode'] } );
+
+  console.log( addressInputVal );
+
+  map = new google.maps.Map( map, opts );
+
+
+  let bounds = new google.maps.LatLngBounds();
 
   autocomplete.bindTo('bounds', map);
 
@@ -192,7 +251,7 @@ function fillInAddress() {
   var place = autocomplete.getPlace();
 
   if (!place.geometry) {
-    window.alert("Autocomplete's returned place contains no geometry");
+    window.error("Autocomplete's returned place contains no geometry");
     return;
   }
 
@@ -257,17 +316,6 @@ function geolocate() {
       autocomplete.setBounds(circle.getBounds());
     });
   }
-}
-
-function convertHex(hex,opacity) {
-		if ( ! hex )
-			return;
-
-    hex = hex.replace('#','');
-    let r = parseInt(hex.substring(0,2), 16);
-    let g = parseInt(hex.substring(2,4), 16);
-    let b = parseInt(hex.substring(4,6), 16);
-    return 'rgba('+r+','+g+','+b+','+opacity/100+')';
 }
 
 require('./style.scss');

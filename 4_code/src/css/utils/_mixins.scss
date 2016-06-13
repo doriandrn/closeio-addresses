@@ -41,6 +41,7 @@
 // $breakpoint - Desired breakpoint. Can be variable or unit.
 // $query - Defaults to `min-width`.
 // $type - Defaults to `screen`.
+$fix-mqs: false !default;
 
 @mixin mq($breakpoint, $query: 'min-width', $type: 'screen') {
   @if $fix-mqs {

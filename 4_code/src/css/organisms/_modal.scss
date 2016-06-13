@@ -1,10 +1,16 @@
 .modal {
-	$actionButHeight: 40px;
+	$actionButHeight: 60px;
 
 	text-align: center;
 	position: relative;
-	padding: 50px;
+	padding: 20px;
 	height: 100%;
+	min-width: 320px;
+	transition: padding .1s ease-in-out;
+
+	@include mq( 540px ) {
+		padding: 40px;
+	}
 
 	&__form,
 	&__cancel {
@@ -29,9 +35,13 @@
 		position: absolute;
 		top: calc( 50% - #{$actionButHeight} );
 		left: 50%;
+		width: calc( 100% - 40px );
 		transform: translate( -50%, -50% );
-
 		transition: all .15s ease-in-out;
+
+		@include mq( 540px ) {
+			width: calc( 100% - 80px );
+		}
 	}
 
 	&__action {
@@ -40,8 +50,7 @@
 
 	&__close {
 		$closeSize: 32px;
-		$closePos:	40px;
-
+		$closePos:	20px;
 		position: fixed $closePos $closePos auto auto;
 		size: $closeSize;
 		line-height: $closeSize - 2px;
@@ -51,7 +60,9 @@
 		
 		overflow: hidden;
 
-		
+		@include mq( 540px ) {
+			position: fixed $closePos*2 $closePos*2 auto auto;
+		}
 
 		&:before {
 			content: 'x';
