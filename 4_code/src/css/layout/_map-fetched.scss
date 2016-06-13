@@ -11,4 +11,19 @@
 			}
 		}
 	}
+	&--full {
+		&.modal.not-empty {
+			.modal {
+				&__content {
+					left: -50%;
+				}
+
+				&__map {
+					left: 0;
+					right: 0;
+					width: 100%;
+				}
+			}
+		}
+	}
 }

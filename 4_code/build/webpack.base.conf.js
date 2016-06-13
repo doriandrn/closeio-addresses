@@ -83,8 +83,24 @@ module.exports = {
         short,
         magic({atRoot: true}),
         pxtorem({replace: false}),
-        magician,
-        ap
+        magician({
+          closeioSymbols: {
+            'closeio-symbols': {
+              variants: {
+                400: {
+                  normal: {
+                    url: {
+                      woff: 'assets/fonts/closeio-symbols.woff',
+                      ttf:  'assets/fonts/closeio-symbols.ttf',
+                      svg:  'assets/fonts/closeio-symbols.svg',
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }),
+        ap //autoprefixer
       ]
     }
   }

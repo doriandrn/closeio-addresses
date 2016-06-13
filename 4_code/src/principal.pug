@@ -1,4 +1,5 @@
-- addresses = locals.addresses || []
+- adr = locals.addresses || []
+- activeAdrIndex = 1
 // - console.log(addresses)
 - path = path + '/' || ''
 
@@ -23,7 +24,7 @@ html
     meta(name='viewport', content='width=device-width, user-scalable=1, initial-scale=1, maximum-scale=1')
     meta(name='apple-mobile-web-app-capable', content='yes')
 
-    script(src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLG_boiHX2rtGQApI2UJ5zpbELKcrD6JY&libraries=places" type="text/javascript")
+    script(src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLG_boiHX2rtGQApI2UJ5zpbELKcrD6JY&libraries=places" + ( adr.length ? "&q=" + adr[activeAdrIndex-1].address : '' ) type="text/javascript")
     script(src="app.js")
 
     link(href="app.css" rel="stylesheet")

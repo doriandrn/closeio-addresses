@@ -1,8 +1,6 @@
 extends principal
 block addressmodal
-	- adr = addresses || []
-	- activeAdrIndex = 1
-	.modal.modal__address.address(class= adr.length ? 'not-empty' : '' )
+	.modal.modal__address.address(class= adr.length ? 'not-empty map--fetched--full' : '' )
 		.modal__header
 			button.button.modal__close.close(data-action="dismiss_modal") Close
 			.modal__title
@@ -10,20 +8,22 @@ block addressmodal
 					if adr.length > 1
 						span.suffix es
 						span.address__counter #{activeAdrIndex}/#{adr.length}
-				p.address__current(class= adr.length ? 'has' : 'none')=adr.length ? adr[activeAdrIndex-1].address : 'None found for this lead.'
-				.address__actions
-					button.button.button__small.address__edit(data-content="Edit Address" data-action="edit")
-					button.button.button__small.address__remove(data-content="Remove Address" data-action="remove")
-					button.button.button__small.button__color.address__new(data-action="add-new") Add New
+				address.address__current(class= adr.length ? 'tag--'+adr[activeAdrIndex-1].tag : 'none')=adr.length ? adr[activeAdrIndex-1].address : 'None found for this lead.'
+
+				form.address__actions.remove(action="/api/lead/id/addresses"+(adr.length ? "/"+adr[activeAdrIndex-1]._id : '') method='POST' onsubmit="return confirm('Are you sure you want to remove this address of {leadname}?');")
+					button.button.button__small.address__edit(data-content="Edit Address" data-action="edit" type="button") #[i]
+					button.button.button__small.address__remove(data-content="Remove Address" data-action="remove" type="submit") #[i]
+					input(type="hidden" name="del" method="_del" value="true")
+					button.button.button__small.button__color.address__new(data-action="add-new" type="button") Add New
 
 		.modal__content
 			button.modal__action.button.button__large.button__color.address__new(data-action="add-new") Add New
-			form.form.form--nojs.modal__form(action="/api/lead/id/addresses/"+(adr.length ? adr[activeAdrIndex-1]._id : '') method='POST' autocomplete="off")
+			form.form.form--nojs.modal__form(action="/api/lead/id/addresses"+(adr.length ? "/" + adr[activeAdrIndex-1]._id : '') method='POST' autocomplete="off")
 				.form__row
 					select.form__select.address__tags(name='tag')
-						option.form__select__option(value='business' data-color='#015F9B' selected) Business
-						option.form__select__option(value='mailing' data-color='#DA00F8') Mailing
-						option.form__select__option(value='other') Other
+						option.form__select__option(value='business' selected= adr.length && adr[activeAdrIndex-1].tag == 'business' ? 'selected' : false ) Business
+						option.form__select__option(value='mailing' selected= adr.length && adr[activeAdrIndex-1].tag == 'mailing' ? 'selected' : false ) Mailing
+						option.form__select__option(value='other' selected= adr.length && adr[activeAdrIndex-1].tag == 'other' ? 'selected' : false ) Other
 				.form__row
 					input#address.address__textarea(type="text" name="address" autofocus placeholder="Enter your address..." value=adr.length ? adr[activeAdrIndex-1].address : '')
 				fieldset.form__address

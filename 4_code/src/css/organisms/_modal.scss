@@ -40,7 +40,7 @@
 
 	&__close {
 		$closeSize: 32px;
-		$closePos:	60px;
+		$closePos:	40px;
 
 		position: fixed $closePos $closePos auto auto;
 		size: $closeSize;
@@ -64,7 +64,7 @@
 		.modal {
 			&__title {
 				transform: translate( -50%, 0 );
-				top: 100px;
+				top: 80px;
 			}
 
 			&__form,
@@ -92,7 +92,7 @@
 				position: absolute;
 				width: calc( 100% - 500px );
 				right: -100%;
-				top: 250px;
+				top: 350px;
 				bottom: 0;
 				transition: right .15s ease-in-out;
 

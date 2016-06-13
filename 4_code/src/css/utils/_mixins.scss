@@ -19,6 +19,21 @@
 	overflow: visible;
 }
 
+
+@mixin icon( $icon ) {
+  content: $icon;
+  font-family: $font-family-symbols;
+  display: inline-block;
+  vertical-align: top;
+  line-height: inherit;
+  text-transform: none;
+}
+
+@mixin tag-color( $color ) {
+	color: $color;
+	background-color: rgba( $color, .1 );
+}
+
 // Media Queries
 //
 // Allows you to use inline media queries. Includes options for `$fix-mqs`.

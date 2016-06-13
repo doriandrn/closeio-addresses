@@ -1,7 +1,3 @@
-
-// require("babel/polyfill");
-// import "babel-polyfill";
-
 let 
 	placeSearch, 
 	autocomplete,
@@ -52,15 +48,16 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 				break;
 
 			case 'add-new':
-				modal.classList.add( 'not-empty' );
-				
+				modal.classList.remove( 'map--fetched', 'map--fetched--full' );
 
+				if ( ! modal.classList.contains( 'not-empty' ) )
+					modal.classList.add( 'not-empty' );
+				
 				if ( ! addressInput )
 					break;
 
 				setTimeout( function() { addressInput.focus(); }, 100 );
 				addressInput.onFocus = geolocate();
-
 				break;
 			
 			case 'cancel-add-new':
@@ -68,6 +65,18 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 				addressInput.value = '';
 				currentAddress.classList.add('none');
 				currentAddress.textContent = defaultState;
+				break;
+
+			case 'edit':
+				console.log('editing');
+				modal.classList.remove( 'map--fetched--full' );
+				modal.classList.add( 'map--fetched' );
+				break;
+
+			case 'remove':
+				event.preventDefault();
+				let confirmRemove = confirm('Are you sure you want to remove this address?');
+				
 				break;
 
 			case 'switch--tag':
@@ -121,16 +130,16 @@ function initTags( el ) {
 	tagsParent.insertBefore( makeUl, tagSelect );
 
 	for ( let i = 0; i < getTags.length; i+=1 ) {
-		tags[getTags[i].value] = getTags[i].dataset.color !== undefined ? getTags[i].dataset.color : '#000000';
+		// tags[getTags[i].value] = getTags[i].dataset.color !== undefined ? getTags[i].dataset.color : '#000000';
 		
 		let tagLi = document.createElement('li');
 		
-		tagLi.classList.add('address__tag');
+		tagLi.classList.add('address__tag', 'tag--' + getTags[i].value );
 		tagLi.textContent = getTags[i].textContent;
 		tagLi.dataset.value = getTags[i].value;
 		tagLi.dataset.action = 'switch--tag';
-		tagLi.style.color = getTags[i].dataset.color;
-		tagLi.style.backgroundColor = convertHex( getTags[i].dataset.color, 10 );
+		// tagLi.style.color = getTags[i].dataset.color;
+		// tagLi.style.backgroundColor = convertHex( getTags[i].dataset.color, 10 );
 
 		if ( getTags[i].selected ) {
 			tagLi.classList.add('active');

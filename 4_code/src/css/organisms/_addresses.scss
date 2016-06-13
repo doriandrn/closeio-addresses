@@ -2,20 +2,84 @@
 	&__current {
 		display: block;
 		margin-bottom: 40px;
+		padding: 5px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    letter-spacing: .1px;
+    font-style: normal;
 
 		&.none {
 			color: rgba( black, .5 );
+			background: transparent;
 		}
 	}
 
 	&__counter {
+		display: inline-block;
+		vertical-align: middle;
 		font-size: 16px;
 		margin-left: 20px;
 		color: rgba( black, .5 );
 	}
 
 	&__actions {
-		display: none;
+		// display: none;
+
+		> .button {
+			i {
+				display: block;
+				position: relative;
+				z-index: -1;
+			}
+
+			&:not(:last-child) {
+				margin-right: 8px;
+			}
+
+			&.address__new {
+				margin-left: 20px;
+			}
+
+			&:not(.address__new) {
+				padding: 0;
+				width: 22px;
+
+				// button Tooltips
+				&:before {
+					content: attr(data-content);
+					position: absolute;
+					bottom: 100%;
+					width: auto;
+					background: white;
+					border: 1px solid rgba( black, .05 );
+					color: rgba( black, .75 );
+					padding: 5px 10px;
+					text-transform: capitalize;
+					letter-spacing: 0;
+					left: 50%;
+					transform: translateX( -50% );
+					border-radius: 2px;
+					opacity: 0;
+					visibility: hidden;
+					white-space: nowrap;
+				}
+
+				&:hover {
+					&:before {
+						opacity: 1;
+						visibility: visible;
+					}
+				}
+			}
+		}
+	}
+
+	&__edit i:before {
+		@include icon('\61')
+	}
+
+	&__remove i:before {
+		@include icon('\62')
 	}
 
 	&__tags {
@@ -30,7 +94,6 @@
 		cursor: default;
 		margin: 0 5px;
 		padding: 0 10px;
-		background: rgba( black, .1 );
 		border-radius: 20px;
 		transition: all .1s ease-in-out;
 

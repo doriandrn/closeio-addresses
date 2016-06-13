@@ -49,7 +49,6 @@ router
   .get( apiBase + '/:id', getAddress )
   .post( apiBase, koaBody, addAddress )
   .post( apiBase + '/:id', koaBody, updateAddress )
-  .del( apiBase + '/:id', removeAddress );
 
 
 function *getAddresses(next) {
@@ -73,17 +72,21 @@ function *addAddress() {
 }
 
 function *updateAddress(id) {
-  this.body = yield this.mongo.db('closeio_addresses').collection('addresses').update({"_id": new ObjectID( this.params.id ) }, this.request.body, { upsert: true }, ( err, result ) => {
-    if (err) 
-      return console.log(err)
-    console.log('Address Updated');
-  });
+  if ( this.request.body.del ) {
+    // delete
+    this.body = yield this.mongo.db('closeio_addresses').collection('addresses').remove({"_id": new ObjectID( this.params.id ) }, true );
+    console.log('Address Removed');
+  } else {
+    //update
+    this.body = this.mongo.db('closeio_addresses').collection('addresses').update({"_id": new ObjectID( this.params.id ) }, this.request.body, { upsert: true }, ( err, result ) => {
+      if (err) 
+        return console.log(err)
+      console.log('Address Updated');
+    });
+    
+  }
   this.status = 200
   this.redirect('/')
-}
-
-function *removeAddress() {
-
 }
 
 app
