@@ -15,7 +15,9 @@ const compiler      = webpack(config);
 const historyApiFallback = require('koa-history-api-fallback');
 const webpackMiddleware = require("koa-webpack-dev-middleware")
 // var webpackDevServer = require('koa-webpack-dev');
-var addresses
+var addresses,
+    ObjectID = require('mongodb').ObjectID,
+    apiBase = '/api/lead/id/addresses';
 
 config.historyApiFallback = true
 
@@ -28,7 +30,6 @@ const pug = new Pug({
   app: app 
 })
 
-
 app.use(common.logger('dev'));
 
 app.use(mongo({
@@ -40,90 +41,46 @@ app.use(mongo({
 }));
 
 
-// // pug.use('server')
-// // app.use(require('koa-static')('/Users/dorian/DRN/srv/closeio/_sources/4_code/dist', {}));
-
-// // server.use( function *(next)  {
-// //   // var addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
-// //   // yield next;
-// //   // this.render('addresses', { path: config.output.path, addresses: addresses }, true)
-// //   this.body = 'mata ta'
-// //   // 
-// // });
-
-// // const CONTENT_TYPE_HTML = 'text/html';
-
-// // app.use(function* rewriteIndex(next) {
-// //   if (this.accepts().toString().substr(0, CONTENT_TYPE_HTML.length) === CONTENT_TYPE_HTML) {
-// //     this.request.url = '/index.html';
-// //   }
-// //   yield *next;
-// // });
-
-
-// // router.get('/', function *(next) {
-// //   console.log('gothome')
-// //   var addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
-// //   this.render('addresses', { path: config.output.path, addresses: addresses }, true)
-// //   // this.body = 'caca'
-// // });
-// // // 
-
-// // app.use( compose([webpackMiddleware(webpack(config)),function *(next)  {
-// //   var addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
-// //   // yield next;
-// //   this.render('addresses', { path: config.output.path, addresses: addresses }, true)
-// //   // this.body = 'mata ta'
-// //   // 
-// // } ]) ) 
-
-// // var fs = require('fs');
-
-// // var readFileThunk = function(src) {
-// //   return new Promise(function (resolve, reject) {
-// //     fs.readFile(src, {'encoding': 'utf8'}, function (err, data) {
-// //       if(err) return reject(err);
-// //       resolve(data);
-// //     });
-// //   });
-// // }
-// //
-// // var render = views("dist", { map: { html: 'pug' } });
-// // app.use(webpackDevServer({
-// //   config: config,
-// // }))
-
-
 router
-  .get('/', function *(next) {
-    console.log('gothome');
-    // this.body = yield readFileThunk(__dirname + '/dist/index.html');
-    
-    addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
-    this.render('index', { path: config.output.path, addresses: addresses, aici: 'da' }, true)
-    // yield next
-    // yield *next;
-    // this.body = 'Hello World!';
+  // App execution
+  .get('/', getAddresses)
+
+  // API
+  .get( apiBase + '/:id', getAddress )
+  .post( apiBase, koaBody, addAddress )
+  .put( apiBase + '/:id', koaBody, updateAddress )
+  .del( apiBase + '/:id', removeAddress );
+
+
+function *getAddresses(next) {
+  addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
+  this.render('index', { path: config.output.path, addresses: addresses }, true)
+}
+
+function *getAddress() {
+  this.body = yield this.mongo.db('closeio_addresses').collection('addresses').find({"_id": new ObjectID( this.params.id ) }).limit(1).toArray();
+  this.status = 200;
+}
+
+function *addAddress() {
+  this.mongo.db('closeio_addresses').collection('addresses').save(this.request.body, (err, result) => {
+    if (err) 
+      return console.log(err)
+    console.log('Added new address!')
   })
-  .post('/api/lead/id/addresses', koaBody, function *(next) {
-    console.log(koaBody);
-    this.mongo.db('closeio_addresses').collection('addresses').save(this.request.body, (err, result) => {
-      if (err) 
-        return console.log(err)
-      console.log('Added new address!')
-    })
-    this.redirect('/')
-    // ...
-    // this.body = 'address added';
-    // this.render('index', { path: config.output.path, addresses: addresses }, true)
-    // yield next
-  })
-  .put('/api/lead/id/addresses/:id', function *(next) {
-    // ...
-  })
-  .del('/api/lead/id/addresses/:id', function *(next) {
-    // ...
-  });
+  this.status = 200
+  this.redirect('/')
+}
+
+function *updateAddress(id) {
+  console.log('ohno');
+  this.mongo.db('closeio_addresses').collection('addresses').update({"_id": new ObjectID( this.params.id ) }, this.request.body, { upsert: true } );
+  this.status = 200
+}
+
+function *removeAddress() {
+
+}
 
 app
   .use(router.routes())

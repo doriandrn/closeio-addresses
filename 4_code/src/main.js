@@ -1,4 +1,6 @@
-require('./style.scss');
+
+// require("babel/polyfill");
+// import "babel-polyfill";
 
 let 
 	placeSearch, 
@@ -15,7 +17,8 @@ let
 	  administrative_area_level_1: 'short_name',
 	  country: 'long_name',
 	  postal_code: 'short_name'
-	};
+	},
+	_ = require('lodash');
 
 document.addEventListener( 'DOMContentLoaded', ( event ) => {
 	let modal = event.target.querySelector('.modal__address');
@@ -67,6 +70,21 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 				currentAddress.textContent = defaultState;
 				break;
 
+			case 'switch--tag':
+				let butVal = button.dataset.value,
+						select = modal.querySelector('select.address__tags');
+				_.each( button.parentNode.children, function(n) {
+					n.classList.remove('active');
+				});
+				_.each( select.children, function( n ) {
+					n.removeAttribute('selected');
+					if ( n.value == button.dataset.value )
+						n.setAttribute('selected', 'selected');
+				});
+				button.classList.add('active');
+				
+				break;
+
 			case 'save':
 				console.dir( componentForm );
 				break;
@@ -108,8 +126,9 @@ function initTags( el ) {
 		let tagLi = document.createElement('li');
 		
 		tagLi.classList.add('address__tag');
-		tagLi.textContent = getTags[i].value;
-		tagLi.dataset.value = getTags[i].textContent;
+		tagLi.textContent = getTags[i].textContent;
+		tagLi.dataset.value = getTags[i].value;
+		tagLi.dataset.action = 'switch--tag';
 		tagLi.style.color = getTags[i].dataset.color;
 		tagLi.style.backgroundColor = convertHex( getTags[i].dataset.color, 10 );
 
@@ -229,3 +248,5 @@ function convertHex(hex,opacity) {
     let b = parseInt(hex.substring(4,6), 16);
     return 'rgba('+r+','+g+','+b+','+opacity/100+')';
 }
+
+require('./style.scss');

@@ -1,8 +1,8 @@
 extends principal
 block addressmodal
 	- adr = addresses || []
-	- activeAdrIndex = 3
-	.modal.modal__address.address
+	- activeAdrIndex = 1
+	.modal.modal__address.address(class= adr.length ? 'not-empty' : '' )
 		.modal__header
 			button.button.modal__close.close(data-action="dismiss_modal") Close
 			.modal__title
@@ -10,7 +10,7 @@ block addressmodal
 					if adr.length > 1
 						span.suffix es
 						span.address__counter #{activeAdrIndex}/#{adr.length}
-				p.address__current(class= adr.length ? 'has' : 'none')=adr.length ? adr[activeAdrIndex].address : 'None found for this lead.'
+				p.address__current(class= adr.length ? 'has' : 'none')=adr.length ? adr[activeAdrIndex-1].address : 'None found for this lead.'
 				.address__actions
 					button.button.button__small.address__edit(data-content="Edit Address" data-action="edit")
 					button.button.button__small.address__remove(data-content="Remove Address" data-action="remove")
@@ -18,27 +18,27 @@ block addressmodal
 
 		.modal__content
 			button.modal__action.button.button__large.button__color.address__new(data-action="add-new") Add New
-			form.form.form--nojs.modal__form(action="/api/lead/id/addresses" method="post" autocomplete="off")
+			form.form.form--nojs.modal__form(action="/api/lead/id/addresses/"+(adr.length ? adr[activeAdrIndex-1]._id : '') method='POST' autocomplete="off")
 				.form__row
 					select.form__select.address__tags(name='tag')
 						option.form__select__option(value='business' data-color='#015F9B' selected) Business
 						option.form__select__option(value='mailing' data-color='#DA00F8') Mailing
 						option.form__select__option(value='other') Other
 				.form__row
-					input#address.address__textarea(type="text" name="address" autofocus placeholder="Enter your address...")
+					input#address.address__textarea(type="text" name="address" autofocus placeholder="Enter your address..." value=adr.length ? adr[activeAdrIndex-1].address : '')
 				fieldset.form__address
 					.form__row
-						input#street_number(type="text" placeholder="Address" name="street_number")
-						input#route(type="text" placeholder="Address (cont.)" name="route")
+						input#street_number(type="text" placeholder="Address" name="street_number" value=adr.length ? adr[activeAdrIndex-1].street_number : '' )
+						input#route(type="text" placeholder="Address (cont.)" name="route" value=adr.length ? adr[activeAdrIndex-1].route : '')
 					.form__row
-						input#locality(type="text" placeholder="City" name="locality")
-						input#administrative_area_level_1(type="text" placeholder="State" name="administrative_area_level_1")
+						input#locality(type="text" placeholder="City" name="locality" value=adr.length ? adr[activeAdrIndex-1].locality : '')
+						input#administrative_area_level_1(type="text" placeholder="State" name="administrative_area_level_1" value=adr.length ? adr[activeAdrIndex-1].administrative_area_level_1 : '')
 					.form__row
-						input#postal_code(type="text" placeholder="Postal Code" name="postal_code")
+						input#postal_code(type="text" placeholder="Postal Code" name="postal_code" value=adr.length ? adr[activeAdrIndex-1].postal_code : '')
 					.form__row
-						input#country(type="text" placeholder="Country" name="country")
+						input#country(type="text" placeholder="Country" name="country" value=adr.length ? adr[activeAdrIndex-1].country : '')
 				.form__submit
-					input.button.button__large.button__color(type="submit" value="Save" data-action="save")
+					input.button.button__large.button__color(type="submit" value=(adr.length ? "Update" : "Save") data-action="save")
 			.modal__cancel
 				button(data-action="cancel-add-new") Cancel
 		.modal__map
