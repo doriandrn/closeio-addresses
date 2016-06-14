@@ -35,7 +35,8 @@ let addressModal = function( settings = '', mainEvent ) {
 
 	this.libs = {
 		autocomplete: () => {
-			let 
+			let map,
+					mapObj,
 					geocoder = new google.maps.Geocoder(),
 		  		initialState = false,
 		  		addressInputVal = this.AMObj.addressData.input.value;
@@ -44,21 +45,16 @@ let addressModal = function( settings = '', mainEvent ) {
 		  		locations = [];
 
 		  _.each( addresses, (address) => {
-		  	geocoder.geocode( { address: address.textContent } ), ( results, status ) => {
-		  		if ( status === 'OK' ) {
-		  			console.log( results[0].geometry.location );
-		  		} else {
-		  			console.error( status );
-		  		}
-		  	};
+		  	locations.push( address.textContent );
 		  });
 
-		  // console.log( locations );
-
+		  console.log( locations );
+		  map = this.AMObj.map.map = document.getElementById('map');
+		  
 		  let bounds = this.AMObj.map.bounds = new google.maps.LatLngBounds();
 		  this.AMObj.map.infoWindow = new google.maps.InfoWindow();
 
-		  let	map = document.getElementById('map'),
+		  let
 		  		maxZoom = 8,
 		  		opts = {
 		    		zoom: maxZoom,
@@ -69,7 +65,7 @@ let addressModal = function( settings = '', mainEvent ) {
 		  for ( let i = 0; i < locations.length; i++ ) {  
 			  let marker = new google.maps.Marker({
 			    position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-			    map: map
+			    map: mapObj
 			  });
 
 			  //extend the bounds to include each marker's position
@@ -78,29 +74,20 @@ let addressModal = function( settings = '', mainEvent ) {
 			  google.maps.event.addListener(marker, 'click', (function(marker, i) {
 			    return function() {
 			      infowindow.setContent(locations[i][0]);
-			      infowindow.open(map, marker);
+			      infowindow.open(mapObj, marker);
 			    }
 			  })(marker, i));
 			}
-
-
-		  
 
 		  this.AMObj.map.autocomplete = new google.maps.places.Autocomplete( ( document.getElementById( 'address' ) ), {types: ['geocode'] } );
 
 		  // console.log( addressInputVal );
 
-		  map = new google.maps.Map( map, opts );
+		  mapObj = new google.maps.Map( map, opts );
 
-		  this.AMObj.map.autocomplete.bindTo('bounds', map);
-
-		  ;
-		  this.AMObj.map.markers = new google.maps.Marker({
-		    map: map,
-		    anchorPoint: new google.maps.Point(0, -29)
-		  });
-		  
+		  this.AMObj.map.autocomplete.bindTo('bounds', mapObj);
 		  this.AMObj.map.autocomplete.addListener( 'place_changed', this.fillInAddress );
+
 		},
 
 
@@ -244,7 +231,7 @@ let addressModal = function( settings = '', mainEvent ) {
 				this.AMObj.addressData.input.value = '';
 			}
 
-			this.putFormData( me.form, me.select, toggle );
+			this.putFormData( me.form, me.select, false );
 		},
 
 		// EDIT THIS
@@ -397,10 +384,10 @@ let addressModal = function( settings = '', mainEvent ) {
 	this.fillInAddress = () => {
 		window.dispatchEvent(new Event('addressUpdated'));
 	  // Get the place details from the autocomplete object.
-	  var place = this.AMObj.map.autocomplete.getPlace();
+	  var place = mapObj.autocomplete.getPlace();
 
-	  if (!place.geometry) {
-	    window.error("Autocomplete's returned place contains no geometry");
+	  if ( ! place.geometry ) {
+	    window.error( "Autocomplete's returned place contains no geometry" );
 	    return;
 	  }
 
@@ -420,10 +407,10 @@ let addressModal = function( settings = '', mainEvent ) {
 	  }
 
 	  if (place.geometry.viewport) {
-	    map.fitBounds(place.geometry.viewport);
+	    mapObj.fitBounds(place.geometry.viewport);
 	  } else {
-	    map.setCenter(place.geometry.location);
-	    map.setZoom(8);
+	    mapObj.setCenter(place.geometry.location);
+	    mapObj.setZoom(8);
 	  }
 
 	  marker.setIcon(/** @type {google.maps.Icon} */({
@@ -446,7 +433,7 @@ let addressModal = function( settings = '', mainEvent ) {
 	  }
 
 	  this.AMObj.map.infoWindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
-	  this.AMObj.map.infoWindow.open(map, marker);
+	  this.AMObj.map.infoWindow.open(mapObj, marker);
 	}
 
 
@@ -461,7 +448,7 @@ let addressModal = function( settings = '', mainEvent ) {
 	        center: geolocation,
 	        radius: position.coords.accuracy
 	      });
-	      this.AMObj.map.autocomplete.setBounds(circle.getBounds());
+	      mapObj.setBounds(circle.getBounds());
 	    });
 	  }
 	}
