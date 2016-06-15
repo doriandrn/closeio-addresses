@@ -56,7 +56,7 @@ class CloseIo_Maps {
 						title: address
 					});
 					google.maps.event.addListener( marker, 'click', () => {
-						infowindow.open( mapObj, marker) ;
+						infowindow.open( this.mapObj, marker) ;
 					});
 
 				} else {

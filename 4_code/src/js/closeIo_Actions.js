@@ -1,19 +1,29 @@
-class CloseIo_Actions extends CloseIo_Addresses {
-	constructor() {
-		super();
-	}
+let 
+
+modal = document.querySelector( '.modal__address' ),
+
+action = ( actionName, objs, target, toggle = true ) => {
+	console.log( actionName );
+	let executor = this.actionName;
+	return executor( toggle );
+},
+
+actionsList = {
+
 	// DISMISS MODAL
-	dismissModal() {
+	'dismiss-modal': ( toggle = true ) => {
 		console.log( 'Modal should have closed...' );
-	}
+	},
 
 	// ADD NEW
-	addNew( toggle = true ) {
-	
-		if ( ! typeof addressData.input === 'object' )
+	'add-new': () => {
+
+		if ( typeof model.addressData !== 'object' )
 			return;
 
 		modalElements.state = 'adding';
+
+		let totalCounter = modalElements.totalCounter;
 
 		// quick debug
 		toggle ? console.log( 'Adding new...' ) : console.log( 'Cancelled Add New...' );
@@ -44,14 +54,14 @@ class CloseIo_Actions extends CloseIo_Addresses {
 			slider.removeSlide(0);
 			slider.slideTo(0); // SHOULD BE ACIVE INDEX WHEN TOGGLE TRIGGERED
 
-			addressData.input.value = '';
+			model.addressData.input.value = '';
 		}
 
-		this.putFormData( form, select, false );
-	}
+		putFormData( form, select, false );
+	},
 
 	// EDIT ADDRESS
-	edit( toggle = true ) {
+	'edit': ( toggle = true ) => {
 		modalElements.state = 'editing';
 
 		if ( toggle ) {
@@ -63,9 +73,10 @@ class CloseIo_Actions extends CloseIo_Addresses {
 		}
 
 		this.putFormData( form, select, toggle );
-	}
+	},
 
-	switchTag( target ) {
+
+	'switch--tag': ( target ) => {
 		let tagVal = target.dataset.value;
 			
 		_.each( target.parentNode.children, function( el ) {
@@ -85,9 +96,9 @@ class CloseIo_Actions extends CloseIo_Addresses {
 			console.log( 'currently editing' );
 			// ToDO: update currentaddress with class of selected tag
 		}
-	}
+	},
 
-	putFormData( f, s, put = true ) {
+	putFormData: ( f, s, put = true ) => {
 		_.each( addressData.model, ( value, key ) => {
 			let field = f.querySelector('input[name='+key+']');
 			if ( field ) {
@@ -137,17 +148,17 @@ class CloseIo_Actions extends CloseIo_Addresses {
 
 		submit.value = put ? 'Update' : 'Save';
 		cancel.dataset.action = put ? 'cancel-edit' : 'cancel-add-new';
-	}
+	},
 
-	swiperInited( swiper, me ) {
+	swiperInited: ( swiper, me ) => {
 		if ( ! addressData.current )
 			addressData = this.modalForm.getCurrentAddressData();
 		
 		this.updateModel();
 		this.putFormData( me.form, me.select, true );
-	}
+	},
 
-	swiperChange( swiper, me ) {
+	swiperChanged: ( swiper, me ) => {
 		let state = me.state;
 
 		me.counter.textContent = swiper.activeIndex + 1;
@@ -157,18 +168,17 @@ class CloseIo_Actions extends CloseIo_Addresses {
 		
 		if ( state === "editing" )
 			this.putFormData( me.form, me.select, true );
-	};
+	},
 
-
-	updateModel() {
+	updateModel: () => {
 		addressData.model = this.updateAFModel( addressData.current );
-	}
+	},
 
-	updateRemoveFormAction( f ) {
+	updateRemoveFormAction: ( f ) => {
 		f.setAttribute( 'action', model.config.baseApi + '/' + addressFormModel.id )	;
-	}
+	},
 
-	updateAFModel( q ) {
+	updateAFModel: ( q ) => {
 		let AFModel = {};
 		if ( ! q )
 			return AFModel;
@@ -176,14 +186,17 @@ class CloseIo_Actions extends CloseIo_Addresses {
 		_.each( q.dataset, ( value, tag ) => {
 			AFModel[tag] = value;
 		});
-		
+
 		AFModel.address = q.textContent;
 
 		if ( AFModel.id && AFModel.id.length > -1 )
 			AFModel.id = AFModel.id.replace(/['"]+/g, '' );
 		
 		return AFModel;
-	};
-}
+	},
+};
 
-module.exports = CloseIo_Actions;
+module.exports = {
+	controller:	actionsList,
+	binder: action
+}

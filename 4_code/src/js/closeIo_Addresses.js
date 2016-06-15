@@ -9,54 +9,36 @@ class CloseIo_Addresses {
 		this.e = event;
 	}
 	init() {
-		let modal = this.modal,
-				model = this.model;
+		let modal = this.modal;
 
 		// Initializing the right way.
-		if ( typeof modal !== 'object' || typeof model !== 'object' ) {
-			console.error( 'Something is really wrong here. Address Modal could not be located.' );
+		if ( typeof modal !== 'object' || typeof this.model !== 'object' ) {
+			console.error( 'Something is really wrong here.' );
 			return false;
 		}
 
 		let init = {
-			queryElements: ( ) => {
-				let form = modal.querySelector('form.modal__form');
-
-				return {
-					form: 				form,
-					removeForm: 	form.querySelector('form.address__actions.remove'),
-					select: 			form.querySelector('select.address__tags'),
-					counter: 			form.querySelector('.address__counter .counter'),
-					totalCounter: form.querySelector('.address__counter .total-counter'),
-					state: 				'',
-				};
-			},
+			// getter
 			slider: ( m ) => {
-				model.config.slider.onInit = ( swiper ) => {
+				this.model.config.slider.onInit = ( swiper ) => {
 					// actions.swiperInited( swiper, m );
 				};		
-				model.config.slider.onSlideChangeStart = ( swiper ) => {
+				this.model.config.slider.onSlideChangeStart = ( swiper ) => {
 					// actions.swiperChange( swiper, m );
 					// updateRemoveFormAction( removeForm );
 					// update map -- move to marker
 				};
 			}
-		},
-		modalElements = init.queryElements();
+		};
 
-		
-		// Modal Elements;
-		// modalElements = modalElements.queryElements();
-		console.log( modalElements );
+
+		console.log( this.modalElements );
 
 		// Slider
-		init.slider( modalElements );
-		
-		// the form...
-		let form = modalElements.form;
-		console.log( 'FORM: ' + form );
+		init.slider( this.modalElements );
 
-		// this.actions( modal );
+		// Deploy actions
+		this.actions( modal );
 	}
 
 	// GETTERS
@@ -72,6 +54,19 @@ class CloseIo_Addresses {
 				totalCounter: '',
 			}
 		}
+	}
+
+	get modalElements() {
+		let form = this.modal.querySelector('form.modal__form');
+
+		return {
+			form: 				form,
+			removeForm: 	this.modal.querySelector('form.address__actions.remove'),
+			select: 			form.querySelector('select.address__tags'),
+			counter: 			this.modal.querySelector('.address__counter .counter'),
+			totalCounter: this.modal.querySelector('.address__counter .total-counter'),
+			state: 				'',
+		};
 	}
 
 	get slider() {
@@ -104,38 +99,27 @@ class CloseIo_Addresses {
 		console.info( obj );
 	}
 
-	// Methods
-	// actions( m ) {
-	// 	m.addEventListener( 'click', ( ev ) => {
-	// 		let target = ev.target,
-	// 		    action = target.dataset.action,
-	// 		    actions = require('./closeIo_Actions');
+	// Actions Methods
+	actions( m, elsObj ) {
+		let actions = require('./closeIo_Actions'); // { action: '', execute: ''}
+		console.log( actions );
 
-	// 		if ( target.tagName !== 'BUTTON' && action === undefined )
-	// 			return;
+		m.addEventListener( 'click', ( ev ) => {
+			let target = ev.target,
+			    action = target.dataset.action;
 
-	// 		let clickEvents = {
-	// 			'dismiss_modal': 	() => { actions.dismissModal(); },
-	// 			'add-new': 				() => { actions.addNew(); },
-	// 			'cancel-add-new': () => { actions.addNew( false ); },
-	// 			'edit': 					() => { actions.edit(); },
-	// 			'cancel-edit': 		() => { actions.edit( false ); },
-	// 			'switch--tag': 		( target ) => { actions.switchTag( target ); }
-	// 		};
+			if ( target.tagName !== 'BUTTON' && action === undefined )
+				return;
 
-	// 		_.each( clickEvents, ( func, data ) => {
-	// 			if ( data === action )
-	// 				func( target );
-	// 		});
+
+			_.each( actions.controller, ( func, data ) => {
+				if ( data === action )
+					actions.binder.apply( actions.controller, [ action, { model: this.model, me: this.modalElements, slider: this.slider }, target ] );
+					// func( this.model, this.modalElements, this.slider, target );
+			});
 			
-	// 	});
-	// }
+		});
+	}
 }
-
-
-
-
-
-
 
 module.exports = CloseIo_Addresses;
