@@ -3,7 +3,7 @@ block addressmodal
 	- var thisAdr = adr[activeAdrIndex-1] 
 	.modal.modal__address.address(class= adr.length ? 'not-empty map--fetched--full' : '' )
 		.modal__header
-			button.button.modal__close.close(data-action="dismiss_modal") Close
+			button.button.modal__close.close(data-action="dismiss-modal") Close
 			.modal__title
 				h1 Address
 					if adr.length > 1

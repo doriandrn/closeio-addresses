@@ -1,4 +1,4 @@
-class CloseIo_Maps {
+export default class CloseIo_Maps {
 	
 	constructor( settings  ) {
 		// super();
@@ -13,14 +13,7 @@ class CloseIo_Maps {
 	}
 
 	init( activeIndex ) {
-		let map = this.map;
 		this.activeIndex = activeIndex + 1;
-
-		if ( ! map ) {
-			console.error( 'Map Container not found');
-			return;
-		}
-
 		this.geolocate();
 		this.makeMap();
 		this.autocomplete();
@@ -41,7 +34,6 @@ class CloseIo_Maps {
 			if ( status === 'OK' ) {
 				if ( status != google.maps.GeocoderStatus.ZERO_RESULTS ) {
 					if ( counter === this.activeIndex ) {
-						console.log( 'am gasit vavr' );
 						this.mapObj.setCenter( results[0].geometry.location );
 					}
 
@@ -178,5 +170,3 @@ class CloseIo_Maps {
 		}
 	}
 }
-
-module.exports = CloseIo_Maps;

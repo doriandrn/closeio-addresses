@@ -1,20 +1,17 @@
-let config = require( './closeio_AM_config' ),
-		CloseIo_Addresses = require( './closeIo_Addresses' ),
-		CloseIo_Maps = require('./closeIo_Maps');
+import config from './config';
+import CloseIo_Addresses from './CloseIo_Addresses';
+import CloseIo_Controller from './CloseIo_Controller';
+import CloseIo_Maps from './CloseIo_Maps';
 
-document.addEventListener( 'DOMContentLoaded', ( ev ) => {
+document.addEventListener( 'DOMContentLoaded', ( event ) => {
 	let 
-		cia = new CloseIo_Addresses( config, ev ),
-		maps = new CloseIo_Maps( config );
-	
-	cia.init();
-
-	const slider = cia.slider;
-
-	console.log( slider );
-
-	maps.init( slider.activeIndex );
-	
+		ci_addresses 	= new CloseIo_Addresses( config ),
+		ci_controller = new CloseIo_Controller( ci_addresses, event ),
+		ci_maps 			= new CloseIo_Maps( config );
+		console.dir( ci_controller );
+		
+	ci_controller.init();
+	// ci_maps.init( ci_addresses.activeIndex );
 });
 
 // Because webpack... urgh...
