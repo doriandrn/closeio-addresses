@@ -1,8 +1,7 @@
-class CloseIo_Maps extends CloseIo_Addresses {
+class CloseIo_Maps {
 	
-	constructor() {
-		super();
-
+	constructor( settings  ) {
+		// super();
 		this.componentForm = {
 			street_number: 	'short_name',
 			route: 					'long_name',
@@ -11,17 +10,25 @@ class CloseIo_Maps extends CloseIo_Addresses {
 			country: 				'long_name',
 			postal_code: 		'short_name'
 		};
+	}
 
-		let map = document.getElementById('map');
+	init( activeIndex ) {
+		let map = this.map;
+		this.activeIndex = activeIndex + 1;
+
 		if ( ! map ) {
 			console.error( 'Map Container not found');
 			return;
 		}
 
-		// this.geolocate();
-		this.map();
+		this.geolocate();
+		this.makeMap();
 		this.autocomplete();
 	}
+
+	get map() {
+		return document.getElementById('map');
+	} 
 
 	geocodeAddress( address, counter ) {
 		let geocoder = new google.maps.Geocoder();
@@ -33,9 +40,9 @@ class CloseIo_Maps extends CloseIo_Addresses {
 		geocoder.geocode( { 'address': address }, ( results, status ) => {
 			if ( status === 'OK' ) {
 				if ( status != google.maps.GeocoderStatus.ZERO_RESULTS ) {
-					if ( counter === slider.activeIndex ) {
+					if ( counter === this.activeIndex ) {
 						console.log( 'am gasit vavr' );
-						mapObj.setCenter( results[0].geometry.location );
+						this.mapObj.setCenter( results[0].geometry.location );
 					}
 
 					let infowindow = new google.maps.InfoWindow({
@@ -45,7 +52,7 @@ class CloseIo_Maps extends CloseIo_Addresses {
 
 					let marker = new google.maps.Marker({
 						position: results[0].geometry.location,
-						map: mapObj,
+						map: this.mapObj,
 						title: address
 					});
 					google.maps.event.addListener( marker, 'click', () => {
@@ -62,10 +69,10 @@ class CloseIo_Maps extends CloseIo_Addresses {
 	}
 
 	// Map
-	map() {
+	makeMap() {
 		let mapObj,
-				addressInputVal = addressData.input.value,
-				addresses = modal.querySelectorAll( '.addresses address' ),
+				// addressInputVal = addressData.input.value,
+				addresses = document.querySelectorAll( '.addresses address' ),
 				locations = [],
 				bounds = new google.maps.LatLngBounds(),
 				maxZoom = 8,
@@ -76,12 +83,13 @@ class CloseIo_Maps extends CloseIo_Addresses {
 				};
 
 		_.each( addresses, ( address ) => {
-			locations.push( { 'address': address.textContent } );
+			let location = address.textContent;
+			locations.push( { 'address': location } );
 			i += 1;
-			setTimeout( this.geocodeAddress( address, i ), delay );
+			setTimeout( this.geocodeAddress( location, i ), 250 );
 		});
 
-		mapObj = new google.maps.Map( map, opts );
+		this.mapObj = new google.maps.Map( map, opts );
 	}
 
 	// AutoComplete
@@ -90,7 +98,7 @@ class CloseIo_Maps extends CloseIo_Addresses {
 			types: ['geocode'] 
 		});
 
-		autocomplete.bindTo('bounds', mapObj);
+		autocomplete.bindTo( 'bounds', this.mapObj );
 		autocomplete.addListener( 'place_changed', this.fillInAddress );
 	}
 
@@ -98,6 +106,9 @@ class CloseIo_Maps extends CloseIo_Addresses {
 	// ToDO: create additional marker
 	fillInAddress() {
 		window.dispatchEvent( new Event( 'addressUpdated' ) );
+
+		let mapObj = this.mapObj;
+
 		// Get the place details from the autocomplete object.
 		let place = mapObj.autocomplete.getPlace();
 
@@ -162,10 +173,10 @@ class CloseIo_Maps extends CloseIo_Addresses {
 					center: geolocation,
 					radius: position.coords.accuracy
 				});
-				mapObj.setBounds(circle.getBounds());
+				// mapObj.setBounds(circle.getBounds());
 			});
 		}
 	}
 }
 
-module.exports = Map;
+module.exports = CloseIo_Maps;

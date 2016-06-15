@@ -1,13 +1,20 @@
-let CloseIo_Addresses = require( './closeIo_Addresses' );
-// let CloseIo_Maps = require('./closeIo_Maps')
+let config = require( './closeio_AM_config' ),
+		CloseIo_Addresses = require( './closeIo_Addresses' ),
+		CloseIo_Maps = require('./closeIo_Maps');
 
 document.addEventListener( 'DOMContentLoaded', ( ev ) => {
 	let 
-		cia = new CloseIo_Addresses( require( './closeio_AM_config' ), ev );
-		// maps = new CloseIo_Maps();
+		cia = new CloseIo_Addresses( config, ev ),
+		maps = new CloseIo_Maps( config );
 	
 	cia.init();
-	// maps();
+
+	const slider = cia.slider;
+
+	console.log( slider );
+
+	maps.init( slider.activeIndex );
+	
 });
 
 // Because webpack... urgh...
