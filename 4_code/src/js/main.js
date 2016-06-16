@@ -11,7 +11,7 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 		console.dir( ci_controller );
 		
 	ci_controller.init();
-	// ci_maps.init( ci_addresses.activeIndex );
+	ci_maps.init( ci_addresses.activeIndex );
 });
 
 // Because webpack... urgh...

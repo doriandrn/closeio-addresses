@@ -211,7 +211,7 @@ export default class CloseIo_Controller {
 
 				// ADD NEW
 				'add-new': ( toggle = true ) => {
-					if ( typeof this.model !== 'object' )
+					if ( typeof this.model !== 'object' || ( toggle && this.state === 'adding' ) )
 						return;
 
 					this.state = 'adding';

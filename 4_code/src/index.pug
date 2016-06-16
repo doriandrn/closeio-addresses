@@ -12,19 +12,23 @@ block addressmodal
 				.addresses
 					.swiper-container
 						.swiper-wrapper
-							each address in adr
+							if adr.length
+								each address in adr
+									.swiper-slide
+										address.address__current(
+											class 						 = 'tag--'+address.tag || 'none'
+											data-id 					 = address._id || ''
+											data-tag					 = address.tag || ''
+											data-street_number = address.street_number || ''
+											data-route				 = address.route || ''
+											data-locality 		 = address.locality || ''
+											data-administrative_area_level_1 = address.administrative_area_level_1 || ''
+											data-postal_code 	 = address.postal_code || ''
+											data-country 	 		 = address.country || ''
+											)=address.address || 'None found for this lead.'
+							else
 								.swiper-slide
-									address.address__current(
-										class 						 = 'tag--'+address.tag || 'none'
-										data-id 					 = address._id || ''
-										data-tag					 = address.tag || ''
-										data-street_number = address.street_number || ''
-										data-route				 = address.route || ''
-										data-locality 		 = address.locality || ''
-										data-administrative_area_level_1 = address.administrative_area_level_1 || ''
-										data-postal_code 	 = address.postal_code || ''
-										data-country 	 		 = address.country || ''
-										)=address.address || 'None found for this lead.'
+									address.address__current None found for this lead.
 						.swiper-pagination
 						.swiper-button-prev.button
 						.swiper-button-next.button
@@ -61,4 +65,9 @@ block addressmodal
 			.modal__cancel
 				button(data-action="cancel-add-new") Cancel
 		.modal__map
+			.loader
+				.cube.c1
+				.cube.c2
+				.cube.c4
+				.cube.c3
 			#map
