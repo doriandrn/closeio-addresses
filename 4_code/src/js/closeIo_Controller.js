@@ -8,12 +8,17 @@ export default class CloseIo_Controller {
 
 	// .modal
 	get modal() {
-		return this.e.target.querySelector( '.modal.modal__address' );
+		return this.model.modal;
 	}
 	
 	// .form
 	get form() {
+		delete this.form;
 		return this.modal.querySelector( 'form.modal__form' );
+	}
+
+	get removeForm() {
+		return this.modal.querySelector( 'form.address__actions.remove' );
 	}
 
 	get activeIndex() {
@@ -49,12 +54,14 @@ export default class CloseIo_Controller {
 			
 			// Init the slider events
 			slider: () => {
+				this.model.config.slider.direction = 'horizontal';
+    		this.model.config.slider.nextButton = '.swiper-button-next';
+    		this.model.config.slider.prevButton = '.swiper-button-prev';
 				this.model.config.slider.onInit = ( swiper ) => {
 					if ( ! this.model.currentAddress.current ) {
 						console.error( 'Error when initing slider' );
 						return;
 					}
-					console.log( 'sliderinited');
 					// this.updateFormData( true );
 				};		
 				this.model.config.slider.onSlideChangeStart = ( swiper ) => {
@@ -66,7 +73,8 @@ export default class CloseIo_Controller {
 					// 	// toggle map-fetched state
 					// }
 					// else
-						this.updateFormData( this.state );
+					this.updateFormData( this.state );
+					this.updateRemoveFormActionId( this.removeForm );
 				};
 			},
 
@@ -121,20 +129,24 @@ export default class CloseIo_Controller {
 	}
 
 	clickers() {
-		this.modal.addEventListener( 'click', ( ev ) => {
-			let target = ev.target,
+		this.modal.addEventListener( 'click', ( e ) => {
+			let target = e.target,
 			    action = target.dataset.action;
 
 			if ( target.tagName !== 'BUTTON' && action === undefined )
 				return;
 
 			if ( action )
-				this.actions.apply( this, [ action, target ] );
+				this.actions.apply( this, [ action, e ] );
 		});
 	}
 
 	// update actionID for remove form
-	updateRemoveFormAction( form, id ) {
+	updateRemoveFormActionId( form ) {
+		let id = this.model.currentAddress.id;
+		if ( ! id )
+			return;
+
 		form.setAttribute( 'action', this.model.config.baseApi + '/' + id );
 	}
 
@@ -193,7 +205,7 @@ export default class CloseIo_Controller {
 	};
 
 	// Actions Methods
-	actions( actionName, target ) {
+	actions( actionName, event ) {
 		
 		console.log( this.modalElements );
 		console.log( this.model );
@@ -201,6 +213,7 @@ export default class CloseIo_Controller {
 		let
 			modal = this.modal,
 			input = this.model.currentAddress.input,
+			uri 	= this.model.config.baseApi,
 			
 			actions = {
 
@@ -215,6 +228,8 @@ export default class CloseIo_Controller {
 						return;
 
 					this.state = 'adding';
+
+					console.log( this.model.modalState );
 
 					let totalCounter = this.modalElements.totalCounter;
 
@@ -250,10 +265,37 @@ export default class CloseIo_Controller {
 						modal.classList.remove( 'not-empty', 'map--fetched' );
 						this.slider.removeSlide(0);
 						this.slider.slideTo(0); // SHOULD BE ACIVE INDEX WHEN TOGGLE TRIGGERED
-
+						this.state = 'editing';
 					}
 
 					// this.updateFormData( this.state );
+				},
+
+				'remove': () => {
+					if ( ! this.model.config.ajax )
+						return;
+
+					event.preventDefault();
+
+					let address = {
+						del: true,
+						id: this.model.currentAddress.id
+					}
+
+					let xhttp = new XMLHttpRequest();
+
+					xhttp.onreadystatechange = () => {
+						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
+							this.slider.removeSlide( this.activeIndex );
+							this.modalElements.totalCounter.textContent -= 1; 
+							// remove this marker
+							// center map to next
+						}
+					}
+
+					xhttp.open( 'POST', uri + '/' + address.id );
+					xhttp.setRequestHeader( 'Content-Type', 'application/json; charset=utf-8' );
+					xhttp.send( JSON.stringify( address ) );
 				},
 
 				// EDIT ADDRESS
@@ -262,7 +304,6 @@ export default class CloseIo_Controller {
 
 					modal.classList.toggle( 'map--fetched--full', ! toggle );
 					modal.classList.toggle( 'map--fetched', toggle );
-
 
 					this.updateFormData( this.state );
 				},
@@ -293,6 +334,32 @@ export default class CloseIo_Controller {
 						// ToDO: update currentaddress with class of selected tag
 					}
 				},
+
+				// Save for ADD NEW
+				'save': () => {
+					if ( ! this.model.config.ajax )
+						return;
+
+					event.preventDefault();
+
+					let fd = {},
+							formdata = new FormData( this.form );
+					for ( let [key, value] of formdata.entries() ) 
+  						fd[key] = value;
+					
+					// Ajax
+					let xhttp = new XMLHttpRequest();
+
+					xhttp.onreadystatechange = () => {
+						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
+							console.log( xhttp.responseText );
+						}
+					}
+
+					xhttp.open( 'POST', uri );
+					xhttp.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+					xhttp.send( JSON.stringify( fd ) );
+				}
 			},
 			toggle = actionName.indexOf( 'cancel-' ) > -1 ? false : true; 
 	
@@ -300,8 +367,9 @@ export default class CloseIo_Controller {
 		console.log( actionName );
 		
 		if ( actionName == 'switch--tag' )
-			toggle = target;
+			toggle = event.target;
 
-		actions[ actionName ]( toggle );
+		if ( typeof actions[ actionName ] === 'function' )
+			actions[ actionName ]( toggle );
 	}
 }

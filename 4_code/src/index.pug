@@ -6,9 +6,8 @@ block addressmodal
 			button.button.modal__close.close(data-action="dismiss-modal") Close
 			.modal__title
 				h1 Address
-					if adr.length > 1
-						span.suffix es
-						span.address__counter #[span.counter=activeAdrIndex]/#[span.total-counter=adr.length]
+					span.suffix es
+					span.address__counter #[span.counter=activeAdrIndex]/#[span.total-counter=adr.length]
 				.addresses
 					.swiper-container
 						.swiper-wrapper
@@ -33,7 +32,7 @@ block addressmodal
 						.swiper-button-prev.button
 						.swiper-button-next.button
 
-				form.address__actions.remove(action="/api/lead/id/addresses"+(adr.length ? "/"+thisAdr._id : '') method='POST' onsubmit="return confirm('Are you sure you want to remove this address of {leadname}?');")
+				form.address__actions.remove(action="/api/lead/id/addresses"+(adr.length ? "/"+thisAdr._id : '') method='POST' onsubmit="return confirm('Are you sure you want to remove this address of {leadname}?');" enctype="application/json")
 					button.button.button__small.address__edit(data-content="Edit Address" data-action="edit" type="button") #[i]
 					button.button.button__small.address__remove(data-content="Remove Address" data-action="remove" type="submit") #[i]
 					input(type="hidden" name="del" method="_del" value="true")
@@ -41,7 +40,7 @@ block addressmodal
 
 		.modal__content
 			button.modal__action.button.button__large.button__color.address__new(data-action="add-new") Add New
-			form.form.form--nojs.modal__form(action="/api/lead/id/addresses" method='POST' autocomplete="off")
+			form.form.form--nojs.modal__form(action="/api/lead/id/addresses" method='POST' autocomplete="off" enctype="application/json")
 				.form__row
 					select.form__select.address__tags(name='tag')
 						option.form__select__option(value='business') Business

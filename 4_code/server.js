@@ -1,5 +1,7 @@
 const koa           = require('koa')
-const koaBody       = require('koa-body')()
+// const koaBody       = require('koa-body')({json:true})
+const koaBody       = require('koa-bodyparser')
+// const koaBody       = require('koa-better-body')
 const Pug           = require('koa-pug')
 const app           = koa()
 // const server        = koa()
@@ -40,15 +42,14 @@ app.use(mongo({
   log: false
 }));
 
-
 router
   // App execution
   .get('/', getAddresses)
 
   // API
   .get( apiBase + '/:id', getAddress )
-  .post( apiBase, koaBody, addAddress )
-  .post( apiBase + '/:id', koaBody, updateAddress )
+  .post( apiBase, addAddress )
+  .post( apiBase + '/:id', updateAddress )
 
 
 function *getAddresses(next) {
@@ -62,13 +63,22 @@ function *getAddress() {
 }
 
 function *addAddress() {
-  this.mongo.db('closeio_addresses').collection('addresses').save(this.request.body, (err, result) => {
+  console.log(  this.request.type );
+  console.log(  this.request.body );
+  
+  if ( this.request.body.length < 1 )
+    console.error( 'Could not add address! Empty object supplied.')
+
+  this.mongo.db('closeio_addresses').collection('addresses').save( this.request.body, (err, result) => {
     if (err) 
       return console.log(err)
+
     console.log('Added new address!')
   })
+
   this.status = 200
   this.redirect('/')
+
 }
 
 function *updateAddress(id) {
@@ -78,7 +88,7 @@ function *updateAddress(id) {
     console.log('Address Removed');
   } else {
     //update
-    this.body = this.mongo.db('closeio_addresses').collection('addresses').update({"_id": new ObjectID( this.params.id ) }, this.request.body, { upsert: true }, ( err, result ) => {
+    this.body = this.mongo.db('closeio_addresses').collection('addresses').update({"_id": new ObjectID( this.params.id ) }, this.body, { upsert: true }, ( err, result ) => {
       if (err) 
         return console.log(err)
       console.log('Address Updated');
@@ -90,6 +100,7 @@ function *updateAddress(id) {
 }
 
 app
+  .use(koaBody())
   .use(router.routes())
   .use(router.allowedMethods())
   .use(historyApiFallback())

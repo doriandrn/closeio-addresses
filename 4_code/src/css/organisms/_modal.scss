@@ -71,6 +71,22 @@
 		}
 	}
 
+	&__map {
+		position: absolute;
+		left: 100%;
+		right: -200%;
+		top: 350px;
+		bottom: 0;
+		overflow: hidden;
+		opacity: 0;
+		visibility: hidden;
+		transition: right .15s ease-in-out, left .15s ease-in-out, opacity .15s ease-in-out;
+
+		#map {
+			size: 100%;
+		}
+	}
+
 	&.not-empty {
 		.modal {
 			&__title {
@@ -104,16 +120,8 @@
 			}
 
 			&__map {
-				position: absolute;
-				left: 50%;
-				right: -100%;
-				top: 350px;
-				bottom: 0;
-				transition: right .15s ease-in-out, left .15s ease-in-out;
-
-				#map {
-					size: 100%;
-				}
+				opacity: 1;
+				visibility: visible;
 			}
 		}
 	}

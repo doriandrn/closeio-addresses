@@ -1,8 +1,6 @@
-export default class CloseIo_Maps {
-	
-	constructor( settings  ) {
-		// super();
-		this.componentForm = {
+let mapObj, 
+		autocomplete, 
+		componentForm = {
 			street_number: 	'short_name',
 			route: 					'long_name',
 			locality: 			'long_name',
@@ -10,9 +8,16 @@ export default class CloseIo_Maps {
 			country: 				'long_name',
 			postal_code: 		'short_name'
 		};
+
+export default class CloseIo_Maps {
+	
+	constructor( config ) {
+		this.config = config;
 	}
 
 	init( activeIndex ) {
+
+		this.geocoder = new google.maps.Geocoder();
 		this.activeIndex = activeIndex + 1;
 		this.geolocate();
 		this.makeMap();
@@ -24,17 +29,16 @@ export default class CloseIo_Maps {
 	} 
 
 	geocodeAddress( address, counter ) {
-		let geocoder = new google.maps.Geocoder();
-		if ( ! geocoder ) {
+		if ( ! this.geocoder ) {
 			console.error( 'Geocoder failed to load.');
 			return;
 		}
 
-		geocoder.geocode( { 'address': address }, ( results, status ) => {
+		this.geocoder.geocode( { 'address': address }, ( results, status ) => {
 			if ( status === 'OK' ) {
 				if ( status != google.maps.GeocoderStatus.ZERO_RESULTS ) {
 					if ( counter === this.activeIndex ) {
-						this.mapObj.setCenter( results[0].geometry.location );
+						mapObj.setCenter( results[0].geometry.location );
 					}
 
 					let infowindow = new google.maps.InfoWindow({
@@ -44,11 +48,11 @@ export default class CloseIo_Maps {
 
 					let marker = new google.maps.Marker({
 						position: results[0].geometry.location,
-						map: this.mapObj,
+						map: mapObj,
 						title: address
 					});
 					google.maps.event.addListener( marker, 'click', () => {
-						infowindow.open( this.mapObj, marker) ;
+						infowindow.open( mapObj, marker) ;
 					});
 
 				} else {
@@ -62,15 +66,13 @@ export default class CloseIo_Maps {
 
 	// Map
 	makeMap() {
-		let mapObj,
-				// addressInputVal = addressData.input.value,
+		let 
 				addresses = document.querySelectorAll( '.addresses address' ),
 				locations = [],
 				bounds = new google.maps.LatLngBounds(),
-				maxZoom = 8,
 				i = 0,
 				opts = {
-					zoom: maxZoom,
+					zoom: this.config.map.maxZoom,
 					mapTypeId: google.maps.MapTypeId.ROADMAP
 				};
 
@@ -81,35 +83,42 @@ export default class CloseIo_Maps {
 			setTimeout( this.geocodeAddress( location, i ), 250 );
 		});
 
-		this.mapObj = new google.maps.Map( map, opts );
+		mapObj = new google.maps.Map( this.map, opts );
 	}
 
 	// AutoComplete
 	autocomplete() {
-		let autocomplete = new google.maps.places.Autocomplete( ( document.getElementById( 'address' ) ), {
-			types: ['geocode'] 
-		});
+		if ( ! mapObj ) {
+			console.error( 'No map object in autocomplete' );
+			return;
+		}
 
-		autocomplete.bindTo( 'bounds', this.mapObj );
+		autocomplete = new google.maps.places.Autocomplete( ( document.getElementById( 'address' ) ), { types: ['geocode'] }),
+
+		autocomplete.bindTo( 'bounds', mapObj );
 		autocomplete.addListener( 'place_changed', this.fillInAddress );
 	}
 
 	// FillInAddresss
 	// ToDO: create additional marker
 	fillInAddress() {
-		window.dispatchEvent( new Event( 'addressUpdated' ) );
 
-		let mapObj = this.mapObj;
+		// console.log( mapObj );
+		
+		if ( ! mapObj ) {
+			console.error( 'No map object in fillInAddress' );
+			return;
+		}
 
 		// Get the place details from the autocomplete object.
-		let place = mapObj.autocomplete.getPlace();
+		let place = autocomplete.getPlace();
 
 		if ( ! place.geometry ) {
 			console.error( "Autocomplete's returned place contains no geometry" );
 			return;
 		}
 
-		for ( var component in super.model.componentForm ) {
+		for ( let component in componentForm ) {
 			document.getElementById(component).value = '';
 			document.getElementById(component).disabled = false;
 		}
@@ -128,30 +137,32 @@ export default class CloseIo_Maps {
 			mapObj.fitBounds( place.geometry.viewport );
 		} else {
 			mapObj.setCenter( place.geometry.location );
-			mapObj.setZoom( maxZoom );
+			// mapObj.setZoom( this.config.map.maxZoom );
 		}
 
-		marker.setIcon(/** @type {google.maps.Icon} */({
-			url: place.icon,
-			size: new google.maps.Size(71, 71),
-			origin: new google.maps.Point(0, 0),
-			anchor: new google.maps.Point(17, 34),
-			scaledSize: new google.maps.Size(35, 35)
-		}));
-		marker.setPosition( place.geometry.location );
-		marker.setVisible( true );
+		// marker.setIcon(/** @type {google.maps.Icon} */({
+		// 	url: place.icon,
+		// 	size: new google.maps.Size(71, 71),
+		// 	origin: new google.maps.Point(0, 0),
+		// 	anchor: new google.maps.Point(17, 34),
+		// 	scaledSize: new google.maps.Size(35, 35)
+		// }));
+		// marker.setPosition( place.geometry.location );
+		// marker.setVisible( true );
 
-		let address = '';
-		if ( place.address_components ) {
-			address = [
-				(place.address_components[0] && place.address_components[0].short_name || ''),
-				(place.address_components[1] && place.address_components[1].short_name || ''),
-				(place.address_components[2] && place.address_components[2].short_name || '')
-			].join(' ');
-		}
+		// let address = '';
+		// if ( place.address_components ) {
+		// 	address = [
+		// 		(place.address_components[0] && place.address_components[0].short_name || ''),
+		// 		(place.address_components[1] && place.address_components[1].short_name || ''),
+		// 		(place.address_components[2] && place.address_components[2].short_name || '')
+		// 	].join(' ');
+		// }
 
-		addressmap.infoWindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
-		addressmap.infoWindow.open( mapObj, marker );
+		// addressmap.infoWindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
+		// addressmap.infoWindow.open( mapObj, marker );
+		
+		window.dispatchEvent( new Event( 'addressUpdated' ) );
 	}
 
 	geolocate() {

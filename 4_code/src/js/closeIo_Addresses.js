@@ -19,13 +19,17 @@ export default class CloseIo_Addresses {
 	// current address lazy getter
 	get currentAddress() {
 		delete this.currentAddress;
+		let active = this.modal.querySelector( '.swiper-slide-active address' );
+		// console.log( active );
+
 		return {
 			input: 				this.modal.querySelector( 'input#address' ),
-			current: 			this.modal.querySelector( '.swiper-slide-active address' ),
+			current: 			active,
+			id: 					active.dataset.id ? active.dataset.id.replace(/['"]+/g, '' ) : ''
 		}
 	}
 
-	// Address Model
+	// Address Model lazy getter
 	get model() {		
 		delete this.model;
 		let AFModel = {},
@@ -40,20 +44,18 @@ export default class CloseIo_Addresses {
 
 		AFModel.address = q.textContent;
 
-		if ( AFModel.id && AFModel.id.length > -1 )
-			AFModel.id = AFModel.id.replace(/['"]+/g, '' );
-
 		return AFModel;
 	}
 
 	// Modal State - based on classes
 	get modalState() {
-		let classes = this.modal.classList.remove('modal', 'modal__address');
-		return classes;
+		return this.modal.classList;
+		// let classes = this.modal.classList.remove('modal', 'modal__address');
+		// return classes;
 	}
 
 	set modalState( classesArray ) {
-		console.log( 'modal state changed to:' + classesArray.toString() );
+		// console.log( 'modal state changed to:' + classesArray.toString() );
 	}
 
 }
