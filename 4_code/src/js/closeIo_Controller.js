@@ -230,11 +230,13 @@ export default class CloseIo_Controller {
 	actions( actionName, event ) {
 
 		let
-			modal 				= this.modal,
-			input 				= this.model.currentAddress.input,
-			uri 					= this.model.config.baseApi,
-			totalCounter 	= this.modalElements.totalCounter,
-			counter 			= this.modalElements.counter,
+			modal 					= this.modal,
+			input 					= this.model.currentAddress.input,
+			uri 						= this.model.config.baseApi,
+			totalCounter 		= this.modalElements.totalCounter,
+			counter 				= this.modalElements.counter,
+			currentAddress 	= this.model.currentAddress.current,
+			none 						= 'None found for this lead.',
 			
 			actions = {
 				// DISMISS MODAL
@@ -274,6 +276,13 @@ export default class CloseIo_Controller {
 
 						if ( tc === 1 )
 							modal.classList.add( 'modal__counter' );
+
+						if ( currentAddress.classList.contains( 'none') ) {
+							currentAddress.classList.remove( 'none' );
+							currentAddress.classList.add( 'adding' );
+							currentAddress.textContent = 'Adding new';
+						}
+
 						
 						// Clear the value
 						input.value = '';
@@ -285,8 +294,18 @@ export default class CloseIo_Controller {
 
 					} else {
 						modal.classList.remove( 'not-empty', 'map--fetched' );
-						this.slider.removeSlide(0);
-						this.slider.slideTo(0); // SHOULD BE ACIVE INDEX WHEN TOGGLE TRIGGERED
+						
+						if ( tc > 1 ) {
+							this.slider.removeSlide(0);
+							this.slider.slideTo(0); 
+							modal.classList.add( 'not-empty', 'map--fetched--full' );
+
+						} else {
+							currentAddress.classList.add( 'none' );
+							currentAddress.classList.remove( 'adding' );
+							currentAddress.textContent = none;
+						}
+
 						this.state = 'editing';
 					}
 
@@ -311,6 +330,7 @@ export default class CloseIo_Controller {
 							this.slider.removeSlide( this.activeIndex );
 							
 							let c = parseInt( totalCounter.textContent );
+							console.log( 'c: ' + c );
 
 							totalCounter.textContent = c - 1; 
 							
@@ -321,7 +341,7 @@ export default class CloseIo_Controller {
 								this.modal.classList.remove( 'not-empty' );
 								counter.textContent = 1;
 								this.slider.prependSlide([
-									'<div class="address__slide swiper-slide"><address class="address tag none">None found for this lead.</address></div>'
+									'<div class="address__slide swiper-slide"><address class="address tag none">' + none + '</address></div>'
 								]);
 							}
 
@@ -390,15 +410,12 @@ export default class CloseIo_Controller {
 							let response = JSON.parse( xhttp.responseText );
 							
 							if ( response.ok ) {
-								// a = current addresss
-								let a = this.model.currentAddress.current,
-										id = response.electionId.replace(/['"]+/g, '' );
+								let id = response.electionId.replace(/['"]+/g, '' );
 
-								a.dataset.id = id; 
-								a.classList.remove( 'adding' );
+								currentAddress.dataset.id = id; 
+								currentAddress.classList.remove( 'adding', 'none' );
 
 								this.state = 'editing';
-								this.model.currentAddress.current.classList.remove( 'none' );
 
 								this.modal.classList.remove('map--fetched');
 								this.modal.classList.add('map--fetched--full');
@@ -408,11 +425,11 @@ export default class CloseIo_Controller {
 								_.each( fd, ( value, key ) => {
 									switch( key ) {
 										default: 
-											a.dataset[ key ] = value;
+											currentAddress.dataset[ key ] = value;
 											break;
 
 										case 'address':
-											a.textContent = value;
+											currentAddress.textContent = value;
 											break;
 									}
 								});
