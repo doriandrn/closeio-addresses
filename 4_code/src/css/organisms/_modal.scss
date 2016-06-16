@@ -12,6 +12,22 @@
 		padding: 40px;
 	}
 
+	&__counter {
+		.address {
+			&__counter {
+				display: inline-block;
+			}
+		}
+
+		.modal {
+			&__title {
+				.suffix {
+					display: inline;
+				}
+			}
+		}
+	}
+
 	&__form,
 	&__cancel {
 		@include vHide;
@@ -38,6 +54,10 @@
 		width: calc( 100% - 40px );
 		transform: translate( -50%, -50% );
 		transition: all .15s ease-in-out;
+
+		.suffix {
+			display: none;
+		}
 
 		@include mq( 540px ) {
 			width: calc( 100% - 80px );

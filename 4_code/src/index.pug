@@ -1,7 +1,7 @@
 extends principal
 block addressmodal
 	- var thisAdr = adr[activeAdrIndex-1] 
-	.modal.modal__address.address(class= adr.length ? 'not-empty map--fetched--full' : '' )
+	.modal.modal__address(class=(adr.length ? 'not-empty map--fetched--full' : '' ) + ' ' + ( adr.length > 1 ? 'modal__counter' : '' ) )
 		.modal__header
 			button.button.modal__close.close(data-action="dismiss-modal") Close
 			.modal__title
@@ -9,12 +9,12 @@ block addressmodal
 					span.suffix es
 					span.address__counter #[span.counter=activeAdrIndex]/#[span.total-counter=adr.length]
 				.addresses
-					.swiper-container
-						.swiper-wrapper
+					.address__container.swiper-container
+						.address__wrapper.swiper-wrapper
 							if adr.length
 								each address in adr
-									.swiper-slide
-										address.tag(
+									.address__slide.swiper-slide
+										address.address.tag(
 											data-id 					 = address._id || ''
 											data-tag					 = address.tag || ''
 											data-street_number = address.street_number || ''
@@ -25,11 +25,10 @@ block addressmodal
 											data-country 	 		 = address.country || ''
 											)=address.address || 'None found for this lead.'
 							else
-								.swiper-slide
-									address.address__current None found for this lead.
-						.swiper-pagination
-						.swiper-button-prev.button
-						.swiper-button-next.button
+								.address__slide
+									address.address.tag None found for this lead.
+						.button.address__prev
+						.button.address__next
 
 				form.address__actions.remove(action="/api/lead/id/addresses"+(adr.length ? "/"+thisAdr._id : '') method='POST' onsubmit="return confirm('Are you sure you want to remove this address of {leadname}?');" enctype="application/json")
 					button.button.button__small.address__edit(data-content="Edit Address" data-action="edit" type="button") #[i]

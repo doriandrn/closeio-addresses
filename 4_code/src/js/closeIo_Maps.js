@@ -1,5 +1,6 @@
 let mapObj, 
-		autocomplete, 
+		autocomplete,
+		autocMarker,
 		componentForm = {
 			street_number: 	'short_name',
 			route: 					'long_name',
@@ -96,6 +97,7 @@ export default class CloseIo_Maps {
 		autocomplete = new google.maps.places.Autocomplete( ( document.getElementById( 'address' ) ), { types: ['geocode'] }),
 
 		autocomplete.bindTo( 'bounds', mapObj );
+		autocMarker = new google.maps.Marker();
 		autocomplete.addListener( 'place_changed', this.fillInAddress );
 	}
 
@@ -135,25 +137,24 @@ export default class CloseIo_Maps {
 
 		if ( place.geometry.viewport ) {
 			mapObj.fitBounds( place.geometry.viewport );
-		} else {
 			mapObj.setCenter( place.geometry.location );
 			// mapObj.setZoom( this.config.map.maxZoom );
 		}
 
-		let marker = new google.maps.Marker({
-			position: place.geometry.location,
-			map: mapObj
-		});
+		// let marker = new google.maps.Marker({
+		// 	position: place.geometry.location,
+		// 	map: mapObj
+		// });
 
-		// marker.setIcon(/** @type {google.maps.Icon} */({
-		// 	url: place.icon,
-		// 	size: new google.maps.Size(71, 71),
-		// 	origin: new google.maps.Point(0, 0),
-		// 	anchor: new google.maps.Point(17, 34),
-		// 	scaledSize: new google.maps.Size(35, 35)
-		// }));
-		// marker.setPosition( place.geometry.location );
-		// marker.setVisible( true );
+		autocMarker.setIcon(/** @type {google.maps.Icon} */({
+			url: place.icon,
+			size: new google.maps.Size(71, 71),
+			origin: new google.maps.Point(0, 0),
+			anchor: new google.maps.Point(17, 34),
+			scaledSize: new google.maps.Size(35, 35)
+		}));
+		autocMarker.setPosition( place.geometry.location );
+		autocMarker.setVisible( true );
 
 		// let address = '';
 		// if ( place.address_components ) {

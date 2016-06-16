@@ -51,12 +51,16 @@ export default class CloseIo_Controller {
 		}
 
 		let init = {
-			
+			counter: () => {
+				if ( parseInt( this.modalElements.totalCounter ) > 1 )
+					this.modal.classList.add( 'modal__counter' );
+			},
+
 			// Init the slider events
 			slider: () => {
 				this.model.config.slider.direction = 'horizontal';
-    		this.model.config.slider.nextButton = '.swiper-button-next';
-    		this.model.config.slider.prevButton = '.swiper-button-prev';
+    		this.model.config.slider.nextButton = '.address__next';
+    		this.model.config.slider.prevButton = '.address__prev';
 				this.model.config.slider.onInit = ( swiper ) => {
 					if ( ! this.model.currentAddress.current ) {
 						console.error( 'Error when initing slider' );
@@ -121,20 +125,26 @@ export default class CloseIo_Controller {
 
 		// Slider
 		init.slider( me );
-		this.slider = new Swiper( '.swiper-container', this.model.config.slider );
+		this.slider = new Swiper( '.address__container', this.model.config.slider );
+
+		// The counter
+		init.counter();
 
 		// Tags
 		init.tags( this.form );
+		
+		// Click actions & events
 		this.clickers();
 		this.events();
 	}
 
 	events() {
 		window.addEventListener( 'addressInserted', ( e ) => {
-			this.modal.classList.add('map--fetched');
+			console.log( 'Got address!' );
+			this.modal.classList.add( 'map--fetched' );
 
 			// do this to update map canvas size because it changed.
-			window.dispatchEvent(new Event('resize'));
+			// setTimeout( () => { google.maps.event.trigger( map, "resize" ) }, 7000 );
 		});
 	}
 
@@ -220,9 +230,11 @@ export default class CloseIo_Controller {
 	actions( actionName, event ) {
 
 		let
-			modal = this.modal,
-			input = this.model.currentAddress.input,
-			uri 	= this.model.config.baseApi,
+			modal 				= this.modal,
+			input 				= this.model.currentAddress.input,
+			uri 					= this.model.config.baseApi,
+			totalCounter 	= this.modalElements.totalCounter,
+			counter 			= this.modalElements.counter,
 			
 			actions = {
 				// DISMISS MODAL
@@ -236,7 +248,6 @@ export default class CloseIo_Controller {
 						return;
 
 					this.state = 'adding';
-					let totalCounter = this.modalElements.totalCounter;
 
 					// quick debug
 					toggle ? console.log( 'Adding new...' ) : console.log( 'Cancelled Add New...' );
@@ -248,7 +259,7 @@ export default class CloseIo_Controller {
 
 						// Add new slide
 						this.slider.prependSlide([
-							'<div class="swiper-slide"><address class="adding tag">Adding New</address></div>'
+							'<div class="address__slide swiper-slide"><address class="address adding tag">Adding New</address></div>'
 						]);
 						this.slider.slideTo(0);
 
@@ -257,6 +268,9 @@ export default class CloseIo_Controller {
 							modal.classList.add( 'not-empty' );
 						
 						modal.classList.remove( 'map--fetched', 'map--fetched--full' );
+
+						if ( tc === 1 )
+							modal.classList.add( 'modal__counter' );
 						
 						// Clear the value
 						input.value = '';
@@ -292,9 +306,19 @@ export default class CloseIo_Controller {
 					xhttp.onreadystatechange = () => {
 						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
 							this.slider.removeSlide( this.activeIndex );
-							this.modalElements.totalCounter.textContent -= 1; 
-							// remove this marker
-							// center map to next
+							
+							let c = parseInt( totalCounter.textContent );
+
+							totalCounter.textContent = c - 1; 
+							
+							if ( c === 2 )
+								this.modal.classList.remove( 'modal__counter' );
+								
+							if ( c === 1 ) {
+								this.modal.classList.remove( 'not-empty' );
+								counter.textContent = 1;
+							}
+
 						}
 					}
 
@@ -327,9 +351,9 @@ export default class CloseIo_Controller {
 
 					// 'option' refers to HTML <option> tag
 					_.each( this.modalElements.select.children, ( option ) => {
-						option.removeAttribute('selected');
+						option.removeAttribute( 'selected' );
 						if ( option.value === target.dataset.value )
-							option.setAttribute('selected', 'selected');
+							option.setAttribute( 'selected', true );
 					});
 					
 					target.classList.add('active');
@@ -366,6 +390,8 @@ export default class CloseIo_Controller {
 
 								a.dataset.id = id; 
 								a.classList.remove( 'adding' );
+
+								this.state = 'editing';
 
 								this.modal.classList.remove('map--fetched');
 								this.modal.classList.add('map--fetched--full');
