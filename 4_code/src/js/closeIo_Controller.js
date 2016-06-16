@@ -16,21 +16,9 @@ export default class CloseIo_Controller {
 		return this.modal.querySelector( 'form.modal__form' );
 	}
 
-	get slider() {
-		return new Swiper( '.swiper-container', this.model.config.slider );
-	}
-
 	get activeIndex() {
 		delete this.activeIndex;
 		return this.slider.activeIndex;
-	}
-
-	get state() {
-		return 'wow';
-	}
-
-	set state( string ) {
-		return string;
 	}
 
 	get modalElements() {
@@ -57,24 +45,28 @@ export default class CloseIo_Controller {
 			return false;
 		}
 
-		console.log( init );
-
 		let init = {
 			
 			// Init the slider events
-			slider: ( m ) => {
+			slider: () => {
 				this.model.config.slider.onInit = ( swiper ) => {
 					if ( ! this.model.currentAddress.current ) {
 						console.error( 'Error when initing slider' );
 						return;
 					}
-					this.updateFormData( this.form, this.model.model, this.model.config.baseApi , true );
+					console.log( 'sliderinited');
+					// this.updateFormData( true );
 				};		
 				this.model.config.slider.onSlideChangeStart = ( swiper ) => {
 					me.counter.textContent = swiper.activeIndex + 1;
 					
-					if ( me.state !== "adding" )
-						this.updateFormData( this.form, this.model, this.model.config.baseApi , true );
+					// A dat add si dupa a schimbat slide'u
+					// if ( this.state === "adding" ) {
+					// 	this.state = 'editing';
+					// 	// toggle map-fetched state
+					// }
+					// else
+						this.updateFormData( this.state );
 				};
 			},
 
@@ -116,10 +108,11 @@ export default class CloseIo_Controller {
 			}
 		}
 
-		console.log( init );
+	
 
 		// Slider
 		init.slider( me );
+		this.slider = new Swiper( '.swiper-container', this.model.config.slider );
 
 		// Tags
 		init.tags( this.form );
@@ -132,8 +125,6 @@ export default class CloseIo_Controller {
 			let target = ev.target,
 			    action = target.dataset.action;
 
-			console.log( 'clicat' );
-
 			if ( target.tagName !== 'BUTTON' && action === undefined )
 				return;
 
@@ -143,22 +134,30 @@ export default class CloseIo_Controller {
 	}
 
 	// update actionID for remove form
-	updateRemoveFormAction( form, id, uri ) {
-		form.setAttribute( 'action', uri + '/' + id );
+	updateRemoveFormAction( form, id ) {
+		form.setAttribute( 'action', this.model.config.baseApi + '/' + id );
 	}
 
 	// update form with data
-	updateFormData( form, data, uri, put = true ) {
-		let select = form.querySelector( 'select.form__select' ),
+	updateFormData( state ) {
+
+		if ( ! state )
+			return;
+
+		let form 	 = this.form,
+				put 	 = state === "editing" ? true : false,
+				select = form.querySelector( 'select.form__select' ),
 				submit = form.querySelector( 'input[type=submit]' ),
 				cancel = document.querySelector( '.modal__cancel button' );
+
+		console.log( 'State: ' + state + ' -- put: ' + put );
 
 		if ( ! submit || ! cancel || ! select ) {
 			console.error( 'Form is broken.' );
 			return;
 		}
 
-		_.each( data, ( value, key ) => {
+		_.each( this.model.model, ( value, key ) => {
 			let field = form.querySelector('input[name=' + key + ']' );
 			if ( field )
 				field.value = put ? value : ''
@@ -166,7 +165,7 @@ export default class CloseIo_Controller {
 				// Tweak these 'manually'
 				switch( key ) {
 					case 'id':
-						form.setAttribute( 'action', put ? uri + '/' + value : uri )
+						form.setAttribute( 'action', put ? this.model.config.baseApi + '/' + value : this.model.config.baseApi )
 						break;
 
 					case 'tag':
@@ -189,19 +188,20 @@ export default class CloseIo_Controller {
 			} // field
 		});
 
-		submit.value = put ? 'Update' : 'Save';
-		cancel.dataset.action = put ? 'cancel-edit' : 'cancel-add-new';
+		submit.value = state === 'editing' ? 'Update' : 'Save';
+		cancel.dataset.action = state === 'editing' ? 'cancel-edit' : 'cancel-add-new';
 	};
 
 	// Actions Methods
 	actions( actionName, target ) {
 		
 		console.log( this.modalElements );
-		console.log( model );
+		console.log( this.model );
 
 		let
 			modal = this.modal,
 			input = this.model.currentAddress.input,
+			
 			actions = {
 
 				// DISMISS MODAL
@@ -211,7 +211,7 @@ export default class CloseIo_Controller {
 
 				// ADD NEW
 				'add-new': ( toggle = true ) => {
-					if ( typeof model !== 'object' )
+					if ( typeof this.model !== 'object' )
 						return;
 
 					this.state = 'adding';
@@ -235,15 +235,16 @@ export default class CloseIo_Controller {
 						// Back to main screen
 						if ( ! modal.classList.contains( 'not-empty' ) )
 							modal.classList.add( 'not-empty' );
+						
 						modal.classList.remove( 'map--fetched', 'map--fetched--full' );
 						
 						// Clear the value
 						input.value = '';
 
-						// Focus on address input - wait for animation 1.5sec
+						// Focus on address input - wait for animation 0.15s
 						setTimeout( () => { 
 							input.focus(); 
-						}, 1500 );
+						}, 150 );
 
 					} else {
 						modal.classList.remove( 'not-empty', 'map--fetched' );
@@ -252,19 +253,18 @@ export default class CloseIo_Controller {
 
 					}
 
-					this.updateFormData( this.modalElements.form, model, super.config.baseApi, false );
+					// this.updateFormData( this.state );
 				},
 
 				// EDIT ADDRESS
 				'edit': ( toggle = true ) => {
-					modalElements.state = 'editing';
-					modal.classList.toggle( 'm')
+					this.state = 'editing';
 
 					modal.classList.toggle( 'map--fetched--full', ! toggle );
 					modal.classList.toggle( 'map--fetched', toggle );
 
 
-					this.updateFormData( modalElements.form, model, super.config.baseApi, false );
+					this.updateFormData( this.state );
 				},
 
 
@@ -275,12 +275,12 @@ export default class CloseIo_Controller {
 
 					let tagVal = target.value;
 						
-					_.each( target.parentNode.children, function( el ) {
+					_.each( target.parentNode.children, ( el ) => {
 						el.classList.remove('active');
 					});
 
 					// 'option' refers to HTML <option> tag
-					_.each( modalElements.select.children, function( option ) {
+					_.each( this.modalElements.select.children, ( option ) => {
 						option.removeAttribute('selected');
 						if ( option.value === target.dataset.value )
 							option.setAttribute('selected', 'selected');
@@ -288,7 +288,7 @@ export default class CloseIo_Controller {
 					
 					target.classList.add('active');
 
-					if ( modalElements.state == "editing" ) {
+					if ( this.state == "editing" ) {
 						console.log( 'currently editing' );
 						// ToDO: update currentaddress with class of selected tag
 					}
