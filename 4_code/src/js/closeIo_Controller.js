@@ -74,7 +74,7 @@ export default class CloseIo_Controller {
 					// }
 					// else
 					this.updateFormData( this.state );
-					this.updateRemoveFormActionId( this.removeForm );
+					this.updateRemoveFormActionId();
 				};
 			},
 
@@ -101,9 +101,10 @@ export default class CloseIo_Controller {
 				_.each( getTags, ( tag ) => {
 					let tagLi = document.createElement('li');
 					
-					tagLi.classList.add('address__tag', 'tag--' + tag.value );
 					tagLi.textContent = tag.textContent;
-					tagLi.dataset.value = tag.value;
+					tagLi.classList.add( 'address__tag', 'tag' );
+					
+					tagLi.dataset.tag = tagLi.dataset.value = tag.value;
 					tagLi.dataset.action = 'switch--tag';
 
 					if ( tag.selected )
@@ -124,8 +125,17 @@ export default class CloseIo_Controller {
 
 		// Tags
 		init.tags( this.form );
-
 		this.clickers();
+		this.events();
+	}
+
+	events() {
+		window.addEventListener( 'addressInserted', ( e ) => {
+			this.modal.classList.add('map--fetched');
+
+			// do this to update map canvas size because it changed.
+			window.dispatchEvent(new Event('resize'));
+		});
 	}
 
 	clickers() {
@@ -142,12 +152,14 @@ export default class CloseIo_Controller {
 	}
 
 	// update actionID for remove form
-	updateRemoveFormActionId( form ) {
-		let id = this.model.currentAddress.id;
+	updateRemoveFormActionId( id ) {
+		if ( typeof id === undefined )
+			id = this.model.currentAddress.id;
+		
 		if ( ! id )
 			return;
 
-		form.setAttribute( 'action', this.model.config.baseApi + '/' + id );
+		this.removeForm.setAttribute( 'action', this.model.config.baseApi + '/' + id );
 	}
 
 	// update form with data
@@ -206,9 +218,6 @@ export default class CloseIo_Controller {
 
 	// Actions Methods
 	actions( actionName, event ) {
-		
-		console.log( this.modalElements );
-		console.log( this.model );
 
 		let
 			modal = this.modal,
@@ -216,7 +225,6 @@ export default class CloseIo_Controller {
 			uri 	= this.model.config.baseApi,
 			
 			actions = {
-
 				// DISMISS MODAL
 				'dismiss-modal': () => {
 					console.log( 'Modal should have closed...' );
@@ -228,9 +236,6 @@ export default class CloseIo_Controller {
 						return;
 
 					this.state = 'adding';
-
-					console.log( this.model.modalState );
-
 					let totalCounter = this.modalElements.totalCounter;
 
 					// quick debug
@@ -243,7 +248,7 @@ export default class CloseIo_Controller {
 
 						// Add new slide
 						this.slider.prependSlide([
-							'<div class="swiper-slide"><address>Adding New</address></div>'
+							'<div class="swiper-slide"><address class="adding tag">Adding New</address></div>'
 						]);
 						this.slider.slideTo(0);
 
@@ -352,7 +357,34 @@ export default class CloseIo_Controller {
 
 					xhttp.onreadystatechange = () => {
 						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
-							console.log( xhttp.responseText );
+							let response = JSON.parse( xhttp.responseText );
+							
+							if ( response.ok ) {
+								// a = current addresss
+								let a = this.model.currentAddress.current,
+										id = response.electionId.replace(/['"]+/g, '' );
+
+								a.dataset.id = id; 
+								a.classList.remove( 'adding' );
+
+								this.modal.classList.remove('map--fetched');
+								this.modal.classList.add('map--fetched--full');
+
+								this.updateRemoveFormActionId( id );
+
+								_.each( fd, ( value, key ) => {
+									switch( key ) {
+										default: 
+											a.dataset[ key ] = value;
+											break;
+
+										case 'address':
+											a.textContent = value;
+											break;
+									}
+								})
+
+							}
 						}
 					}
 

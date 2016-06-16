@@ -14,8 +14,7 @@ block addressmodal
 							if adr.length
 								each address in adr
 									.swiper-slide
-										address.address__current(
-											class 						 = 'tag--'+address.tag || 'none'
+										address.tag(
 											data-id 					 = address._id || ''
 											data-tag					 = address.tag || ''
 											data-street_number = address.street_number || ''

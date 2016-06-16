@@ -20,7 +20,6 @@ export default class CloseIo_Addresses {
 	get currentAddress() {
 		delete this.currentAddress;
 		let active = this.modal.querySelector( '.swiper-slide-active address' );
-		// console.log( active );
 
 		return {
 			input: 				this.modal.querySelector( 'input#address' ),
@@ -50,12 +49,11 @@ export default class CloseIo_Addresses {
 	// Modal State - based on classes
 	get modalState() {
 		return this.modal.classList;
-		// let classes = this.modal.classList.remove('modal', 'modal__address');
-		// return classes;
 	}
 
 	set modalState( classesArray ) {
-		// console.log( 'modal state changed to:' + classesArray.toString() );
+		this.modal.classList.add( classesArray );
+		console.log( 'modal state changed to:' + classesArray.toString() );
 	}
 
 }

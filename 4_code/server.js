@@ -50,6 +50,7 @@ router
   .get( apiBase + '/:id', getAddress )
   .post( apiBase, addAddress )
   .post( apiBase + '/:id', updateAddress )
+  .put( apiBase + '/:id', updateAddress )
 
 
 function *getAddresses(next) {
@@ -69,15 +70,9 @@ function *addAddress() {
   if ( this.request.body.length < 1 )
     console.error( 'Could not add address! Empty object supplied.')
 
-  this.mongo.db('closeio_addresses').collection('addresses').save( this.request.body, (err, result) => {
-    if (err) 
-      return console.log(err)
-
-    console.log('Added new address!')
-  })
-
+  this.body = yield this.mongo.db('closeio_addresses').collection('addresses').save( this.request.body );
   this.status = 200
-  this.redirect('/')
+  // this.redirect('/')
 
 }
 

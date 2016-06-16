@@ -1,14 +1,13 @@
 .tag {
-	&--business {
+	&[data-tag=business] {
 		@include tag-color( #015f9b );
-		
 	}
 
-	&--mailing {
+	&[data-tag=mailing] {
 		@include tag-color( #da00f8 );
 	}
 
-	&--other {
+	&[data-tag=other] {
 		@include tag-color( #242322 );
 	}
 }

@@ -2,19 +2,25 @@
 	&es {
 		display: block;
 		margin-bottom: 40px;
-	}
 
-	&__current {
-		padding: 5px 20px;
-    border-radius: 20px;
-    font-size: 13px;
-    line-height: 24px;
-    letter-spacing: .1px;
-    font-style: normal;
+		address {
+			padding: 5px 20px;
+	    border-radius: 20px;
+	    font-size: 13px;
+	    line-height: 24px;
+	    letter-spacing: .1px;
+	    font-style: normal;
+	    transition: all .15s ease-in-out;
 
-		&.none {
-			color: rgba( black, .5 );
-			background: transparent;
+			&.none {
+				color: rgba( black, .5 );
+				background: transparent;
+			}
+
+			&.adding {
+				font-style: italic;
+				color: rgba( black, .5 );
+			}
 		}
 	}
 

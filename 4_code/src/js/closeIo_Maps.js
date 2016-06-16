@@ -140,6 +140,11 @@ export default class CloseIo_Maps {
 			// mapObj.setZoom( this.config.map.maxZoom );
 		}
 
+		let marker = new google.maps.Marker({
+			position: place.geometry.location,
+			map: mapObj
+		});
+
 		// marker.setIcon(/** @type {google.maps.Icon} */({
 		// 	url: place.icon,
 		// 	size: new google.maps.Size(71, 71),
@@ -162,7 +167,7 @@ export default class CloseIo_Maps {
 		// addressmap.infoWindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
 		// addressmap.infoWindow.open( mapObj, marker );
 		
-		window.dispatchEvent( new Event( 'addressUpdated' ) );
+		window.dispatchEvent( new Event( 'addressInserted' ) );
 	}
 
 	geolocate() {
