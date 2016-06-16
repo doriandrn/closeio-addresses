@@ -30,12 +30,17 @@ export default class CloseIo_Maps {
 	} 
 
 	geocodeAddress( address, counter ) {
+		if ( ! address || address.classList.contains('none') )
+			return;
+
+		console.log( address );
+
 		if ( ! this.geocoder ) {
 			console.error( 'Geocoder failed to load.');
 			return;
 		}
 
-		this.geocoder.geocode( { 'address': address }, ( results, status ) => {
+		this.geocoder.geocode( { 'address': address.textContent }, ( results, status ) => {
 			if ( status === 'OK' ) {
 				if ( status != google.maps.GeocoderStatus.ZERO_RESULTS ) {
 					if ( counter === this.activeIndex ) {
@@ -50,14 +55,14 @@ export default class CloseIo_Maps {
 					let marker = new google.maps.Marker({
 						position: results[0].geometry.location,
 						map: mapObj,
-						title: address
+						title: address.textContent
 					});
 					google.maps.event.addListener( marker, 'click', () => {
 						infowindow.open( mapObj, marker) ;
 					});
 
 				} else {
-					console.error( "Geocoder - No results found." );
+					console.info( "Geocoder - No results found." );
 				}
 			} else {
 				console.error( "Geocoder - Error: " + status );
@@ -81,7 +86,7 @@ export default class CloseIo_Maps {
 			let location = address.textContent;
 			locations.push( { 'address': location } );
 			i += 1;
-			setTimeout( this.geocodeAddress( location, i ), 250 );
+			setTimeout( this.geocodeAddress( address, i ), 250 );
 		});
 
 		mapObj = new google.maps.Map( this.map, opts );

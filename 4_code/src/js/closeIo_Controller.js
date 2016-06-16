@@ -258,10 +258,13 @@ export default class CloseIo_Controller {
 					if ( toggle ) {
 
 						// Add new slide
-						this.slider.prependSlide([
-							'<div class="address__slide swiper-slide"><address class="address adding tag">Adding New</address></div>'
-						]);
-						this.slider.slideTo(0);
+						if ( tc > 0 ) {
+							this.slider.prependSlide([
+								'<div class="address__slide swiper-slide"><address class="address adding tag">Adding New</address></div>'
+							]);
+							this.slider.slideTo(0);
+
+						}
 
 						// Back to main screen
 						if ( ! modal.classList.contains( 'not-empty' ) )
@@ -317,6 +320,9 @@ export default class CloseIo_Controller {
 							if ( c === 1 ) {
 								this.modal.classList.remove( 'not-empty' );
 								counter.textContent = 1;
+								this.slider.prependSlide([
+									'<div class="address__slide swiper-slide"><address class="address tag none">None found for this lead.</address></div>'
+								]);
 							}
 
 						}
@@ -360,7 +366,7 @@ export default class CloseIo_Controller {
 
 					if ( this.state == "editing" ) {
 						console.log( 'currently editing' );
-						// ToDO: update currentaddress with class of selected tag
+						// ToDO: update currentAddress with class of selected tag
 					}
 				},
 
@@ -392,6 +398,7 @@ export default class CloseIo_Controller {
 								a.classList.remove( 'adding' );
 
 								this.state = 'editing';
+								this.model.currentAddress.current.classList.remove( 'none' );
 
 								this.modal.classList.remove('map--fetched');
 								this.modal.classList.add('map--fetched--full');
@@ -408,7 +415,10 @@ export default class CloseIo_Controller {
 											a.textContent = value;
 											break;
 									}
-								})
+								});
+
+								if ( totalCounter === 1 )
+									slider.removeSlide( 1 );
 
 							}
 						}
