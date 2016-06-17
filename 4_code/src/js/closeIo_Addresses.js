@@ -48,6 +48,7 @@ export default class CloseIo_Addresses {
 
 	// Modal State - based on classes
 	get modalState() {
+		// let parse
 		return this.modal.classList;
 	}
 

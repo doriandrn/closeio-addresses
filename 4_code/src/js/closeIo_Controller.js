@@ -39,10 +39,32 @@ export default class CloseIo_Controller {
 	get formData() {
 		let fd = {},
 				formdata = new FormData( this.form );
-					
-		if ( formdata !== undefined )
+			
+		console.log( formdata );
+
+		if ( formdata.entries )
 			for ( let [ key, value ] of formdata )
 				fd[ key ] = value;
+		
+		else { // this is for safari
+			let inputs = this.form.querySelectorAll( 'input' ),
+					select = this.form.querySelector( 'select' )
+			
+			_.each( inputs, ( input ) => {
+					if ( input.type !== "submit" )
+						fd[ input.name ] = input.value;
+			});
+			
+			let options = select.querySelectorAll( 'option' );
+			console.log( options );
+
+			_.each( options, ( option ) => {
+				if ( option.attributes.selected )
+					fd[ select.name ] = option.value;
+			});
+		}
+
+		console.log( fd );
 
 		return fd;
 	}
@@ -413,7 +435,8 @@ export default class CloseIo_Controller {
 					let xhttp = new XMLHttpRequest(),
 							fd = this.formData;
 
-					console.log( fd );
+					if ( typeof fd !== 'object' )
+						return;
 
 					xhttp.onreadystatechange = () => {
 						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
@@ -498,6 +521,9 @@ export default class CloseIo_Controller {
 					let xhttp = new XMLHttpRequest(),
 							fd 		= this.formData;
 
+					if ( typeof fd !== 'object' )
+						return;
+
 					xhttp.onreadystatechange = () => {
 						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
 							let response = JSON.parse( xhttp.responseText );
@@ -505,7 +531,6 @@ export default class CloseIo_Controller {
 							
 							if ( response.ok ) {
 								let _id = response.upserted.length < 1 ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
-								console.log( 'newID: ' + id );
 
 								currentAddress.dataset.id = _id; 
 								currentAddress.classList.remove( 'adding', 'none' );

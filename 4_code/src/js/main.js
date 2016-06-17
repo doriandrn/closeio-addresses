@@ -8,7 +8,6 @@ document.addEventListener( 'DOMContentLoaded', ( event ) => {
 		ci_addresses 	= new CloseIo_Addresses( config ),
 		ci_controller = new CloseIo_Controller( ci_addresses, event ),
 		ci_maps 			= new CloseIo_Maps( config );
-		console.dir( ci_controller );
 		
 	ci_controller.init();
 	ci_maps.init( ci_controller.activeIndex );
