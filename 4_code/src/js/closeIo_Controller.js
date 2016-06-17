@@ -36,13 +36,39 @@ export default class CloseIo_Controller {
 		};
 	}
 
+	get formData() {
+		let fd = {},
+				formdata = new FormData( this.form );
+					
+		if ( formdata !== undefined )
+			for ( let [ key, value ] of formdata )
+				fd[ key ] = value;
+
+		return fd;
+	}
+
+	formValid() {
+		if ( ! this.model.config.ajax || ! this.validateInput( input ) )
+			return false;
+
+		return true;
+	}
+
+	// empty input or too short
+	validateInput( input ) {
+		if ( input.value.length < 4 ) {
+			input.classList.add( 'invalid' );
+			return false;
+		}
+
+		return true;
+	}
 
 	// Initialize
 	init() {
 
 		let modal = this.modal,
 				me 		= this.modalElements;
-
 
 		// Initializing the right way.
 		if ( typeof modal !== 'object' || typeof this.model !== 'object' ) {
@@ -122,8 +148,6 @@ export default class CloseIo_Controller {
 			}
 		}
 
-	
-
 		// Slider
 		init.slider( me );
 		this.slider = new Swiper( '.address__container', this.model.config.slider );
@@ -143,9 +167,7 @@ export default class CloseIo_Controller {
 		window.addEventListener( 'addressInserted', ( e ) => {
 			console.log( 'Got address!' );
 			this.modal.classList.add( 'map--fetched' );
-
-			// do this to update map canvas size because it changed.
-			// setTimeout( () => { google.maps.event.trigger( map, "resize" ) }, 7000 );
+			this.model.currentAddress.input.classList.remove( 'invalid' );
 		});
 	}
 
@@ -160,6 +182,14 @@ export default class CloseIo_Controller {
 			if ( action )
 				this.actions.apply( this, [ action, e ] );
 		});
+	}
+
+	updateMap() {
+		// updates map size & centers position - wait for anim .15s
+		setTimeout( () => {
+			window.dispatchEvent( new Event( 'resize' ) );
+			window.dispatchEvent( new Event( 'addressSwiped' ) );
+		}, 150 );
 	}
 
 	// update actionID for remove form
@@ -224,6 +254,7 @@ export default class CloseIo_Controller {
 		});
 
 		submit.value = state === 'editing' ? 'Update' : 'Save';
+		submit.dataset.action = state === 'editing' ? 'update' : 'save';
 		cancel.dataset.action = state === 'editing' ? 'cancel-edit' : 'cancel-add-new';
 	};
 
@@ -237,6 +268,8 @@ export default class CloseIo_Controller {
 			totalCounter 		= this.modalElements.totalCounter,
 			counter 				= this.modalElements.counter,
 			currentAddress 	= this.model.currentAddress.current,
+			id 							= this.model.currentAddress.id.replace(/['"]+/g, '' ),
+			next 						= this.modal.querySelector( '.address__next' ),
 			none 						= 'None found for this lead.',
 			
 			actions = {
@@ -251,6 +284,7 @@ export default class CloseIo_Controller {
 						return;
 
 					this.state = 'adding';
+					this.model.currentAddress.input.classList.remove( 'invalid' );
 
 					// quick debug
 					toggle ? console.log( 'Adding new...' ) : console.log( 'Cancelled Add New...' );
@@ -266,8 +300,9 @@ export default class CloseIo_Controller {
 								'<div class="address__slide swiper-slide"><address class="address adding tag">Adding New</address></div>'
 							]);
 							this.slider.slideTo(0);
-
 						}
+
+						next.dataset.action = 'cancel-add-new';
 
 						// Back to main screen
 						if ( ! modal.classList.contains( 'not-empty' ) )
@@ -295,6 +330,7 @@ export default class CloseIo_Controller {
 
 					} else {
 						modal.classList.remove( 'not-empty', 'map--fetched' );
+						delete next.dataset.action;
 						
 						if ( tc > 1 ) {
 							this.slider.removeSlide(0);
@@ -321,7 +357,7 @@ export default class CloseIo_Controller {
 
 					let address = {
 						del: true,
-						id: this.model.currentAddress.id
+						id: id
 					}
 
 					let xhttp = new XMLHttpRequest();
@@ -352,7 +388,7 @@ export default class CloseIo_Controller {
 						}
 					}
 
-					xhttp.open( 'PUT', uri + '/' + address.id );
+					xhttp.open( 'PUT', uri + '/' + id );
 					xhttp.setRequestHeader( 'Content-Type', 'application/json; charset=utf-8' );
 					xhttp.send( JSON.stringify( address ) );
 				},
@@ -363,13 +399,68 @@ export default class CloseIo_Controller {
 
 					modal.classList.toggle( 'map--fetched--full', ! toggle );
 					modal.classList.toggle( 'map--fetched', toggle );
-
 					this.updateFormData( this.state );
+					this.updateMap();
+				},
+
+				'update': () => {
+					if ( ! this.formValid )
+						return;
+					else
+						event.preventDefault();
+
+					// Ajax
+					let xhttp = new XMLHttpRequest(),
+							fd = this.formData;
+
+					console.log( fd );
+
+					xhttp.onreadystatechange = () => {
+						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
+							let response = JSON.parse( xhttp.responseText );
+							console.log( response );
+							
+							// if ( response.ok ) {
+							// 	let id = response.upserted.length < 1 ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
+							// 	console.log( 'newID: ' + id );
+
+							// 	currentAddress.dataset.id = id; 
+							// 	currentAddress.classList.remove( 'adding', 'none' );
+
+							// 	this.state = 'editing';
+
+							// 	this.modal.classList.remove('map--fetched');
+							// 	this.modal.classList.add('map--fetched--full');
+
+							// 	this.updateRemoveFormActionId( id );
+
+							// 	_.each( fd, ( value, key ) => {
+							// 		switch( key ) {
+							// 			default: 
+							// 				currentAddress.dataset[ key ] = value;
+							// 				break;
+
+							// 			case 'address':
+							// 				currentAddress.textContent = value;
+							// 				break;
+							// 		}
+							// 	});
+
+							// 	if ( totalCounter === 1 )
+							// 		slider.removeSlide( 1 );
+
+							// 	this.updateMap();
+							// }
+						}
+					}
+
+					xhttp.open( 'PUT', uri + '/' + id );
+					xhttp.setRequestHeader( 'Content-Type', 'application/json; charset=utf-8' );
+					xhttp.send( JSON.stringify( fd ) );
 				},
 
 
 				'switch--tag': ( target ) => {
-
 					if ( ! target )
 						return;
 
@@ -396,24 +487,16 @@ export default class CloseIo_Controller {
 
 				// Save for ADD NEW
 				'save': () => {
-					if ( ! this.model.config.ajax )
+					if ( ! this.formValid )
 						return;
+					else
+						event.preventDefault();
 
-					event.preventDefault();
-
-					let fd = {},
-							formdata = new FormData( this.form );
-					
-					if ( formdata.entries !== undefined )
-						for ( let [ key, value ] of formdata.entries() ) 
-  						fd[ key ] = value;
-  				else {
-  					console.log( 'formdata not working here' );
-  					return;
-  				}
+					delete next.dataset.action;
 					
 					// Ajax
-					let xhttp = new XMLHttpRequest();
+					let xhttp = new XMLHttpRequest(),
+							fd 		= this.formData;
 
 					xhttp.onreadystatechange = () => {
 						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
@@ -421,10 +504,10 @@ export default class CloseIo_Controller {
 							console.log( response );
 							
 							if ( response.ok ) {
-								let id = response.upserted.length < 1 ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
+								let _id = response.upserted.length < 1 ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
 								console.log( 'newID: ' + id );
 
-								currentAddress.dataset.id = id; 
+								currentAddress.dataset.id = _id; 
 								currentAddress.classList.remove( 'adding', 'none' );
 
 								this.state = 'editing';
@@ -432,7 +515,7 @@ export default class CloseIo_Controller {
 								this.modal.classList.remove('map--fetched');
 								this.modal.classList.add('map--fetched--full');
 
-								this.updateRemoveFormActionId( id );
+								this.updateRemoveFormActionId( _id );
 
 								_.each( fd, ( value, key ) => {
 									switch( key ) {
@@ -449,6 +532,7 @@ export default class CloseIo_Controller {
 								if ( totalCounter === 1 )
 									slider.removeSlide( 1 );
 
+								this.updateMap();
 							}
 						}
 					}

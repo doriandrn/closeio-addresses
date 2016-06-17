@@ -32,7 +32,7 @@ block addressmodal
 						.button.address__prev
 						.button.address__next
 
-				form.address__actions.remove(action="/api/lead/id/addresses"+(adr.length ? "/"+thisAdr._id : '') method='POST' onsubmit="return confirm('Are you sure you want to remove this address of {leadname}?');" enctype="application/json")
+				form.address__actions.remove(action="/api/lead/id/addresses"+(adr.length ? "/" + thisAdr._id : '') method='POST' onsubmit="return confirm('Are you sure you want to remove this address of {leadname}?');" enctype="application/json")
 					button.button.button__small.address__edit(data-content="Edit Address" data-action="edit" type="button") #[i]
 					button.button.button__small.address__remove(data-content="Remove Address" data-action="remove" type="submit") #[i]
 					input(type="hidden" name="del" method="_del" value="true")
@@ -40,7 +40,7 @@ block addressmodal
 
 		.modal__content
 			button.modal__action.button.button__large.button__color.address__new(data-action="add-new") Add New
-			form.form.form--nojs.modal__form(action="/api/lead/id/addresses" method='POST' autocomplete="off" enctype="application/json")
+			form.form.modal__form(action="/api/lead/id/addresses" method='POST' autocomplete="off" enctype="application/json")
 				.form__row
 					select.form__select.address__tags(name='tag')
 						option.form__select__option(value='business') Business

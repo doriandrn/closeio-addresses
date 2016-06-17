@@ -38,8 +38,6 @@ export default class CloseIo_Maps {
 			return;
 		}
 
-		console.log( 'geocoding...' );
-
 		this.geocoder.geocode( { 'address': address.textContent }, ( results, status ) => {
 			if ( status === 'OK' ) {
 				if ( status != google.maps.GeocoderStatus.ZERO_RESULTS ) {
@@ -77,6 +75,7 @@ export default class CloseIo_Maps {
 	makeMap() {
 		let 
 				addresses = document.querySelectorAll( '.addresses address' ),
+				current = document.querySelector( '.swiper-slide-active address' ),
 				bounds = new google.maps.LatLngBounds(),
 				infowindow,
 				i = 0,
@@ -87,11 +86,8 @@ export default class CloseIo_Maps {
 
 
 		mapObj = new google.maps.Map( this.map, opts );
-		let current = document.querySelector( '.swiper-slide-active address' );
 		if ( current.dataset.lat && current.dataset.lng )
-			mapObj.setCenter( new google.maps.LatLng( { lat: parseFloat( current.dataset.lat ), lng: parseFloat( current.dataset.lng ) } ) )
-		else
-			console.log( 'mata' );
+			mapObj.setCenter( new google.maps.LatLng( { lat: parseFloat( current.dataset.lat ), lng: parseFloat( current.dataset.lng ) } ) );
 
 		// add markers or geocode them if no lat lng specified for addresss
 		_.each( addresses, ( address ) => {
@@ -174,8 +170,12 @@ export default class CloseIo_Maps {
 		}
 
 		if ( place.geometry.viewport ) {
-			mapObj.fitBounds( place.geometry.viewport );
-			mapObj.setCenter( place.geometry.location );
+			
+			setTimeout( () => {
+				window.dispatchEvent( new Event( 'resize' ) );
+				mapObj.fitBounds( place.geometry.viewport );
+				mapObj.setCenter( place.geometry.location );
+			}, 150 );
 			
 			document.getElementById('lat').value = place.geometry.location.lat();
 			document.getElementById('lng').value = place.geometry.location.lng();

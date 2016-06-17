@@ -31,6 +31,10 @@
 
 			#address {
 				padding-left: 40px;
+
+				&.invalid {
+					border-color: red;
+				}
 			}
 		}
 	}
