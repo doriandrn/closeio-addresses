@@ -38,6 +38,8 @@ export default class CloseIo_Maps {
 			return;
 		}
 
+		console.log( 'geocoding...' );
+
 		this.geocoder.geocode( { 'address': address.textContent }, ( results, status ) => {
 			if ( status === 'OK' ) {
 				if ( status != google.maps.GeocoderStatus.ZERO_RESULTS ) {
@@ -75,22 +77,54 @@ export default class CloseIo_Maps {
 	makeMap() {
 		let 
 				addresses = document.querySelectorAll( '.addresses address' ),
-				locations = [],
 				bounds = new google.maps.LatLngBounds(),
+				infowindow,
 				i = 0,
 				opts = {
 					zoom: this.config.map.maxZoom,
 					mapTypeId: google.maps.MapTypeId.ROADMAP
 				};
 
-		_.each( addresses, ( address ) => {
-			let location = address.textContent;
-			locations.push( { 'address': location } );
-			i += 1;
-			setTimeout( this.geocodeAddress( address, i ), 250 );
-		});
 
 		mapObj = new google.maps.Map( this.map, opts );
+		let current = document.querySelector( '.swiper-slide-active address' );
+		if ( current.dataset.lat && current.dataset.lng )
+			mapObj.setCenter( new google.maps.LatLng( { lat: parseFloat( current.dataset.lat ), lng: parseFloat( current.dataset.lng ) } ) )
+		else
+			console.log( 'mata' );
+
+		// add markers or geocode them if no lat lng specified for addresss
+		_.each( addresses, ( address ) => {
+			i += 1;
+
+			if ( ! address.dataset.lat || ! address.dataset.lng ) {
+				setTimeout( this.geocodeAddress( address, i ), 250 );
+			}
+
+			else {
+				let position = new google.maps.LatLng( { lat: parseFloat( address.dataset.lat ), lng: parseFloat( address.dataset.lng ) } ),
+				
+				marker = new google.maps.Marker({
+					position: position,
+					map: mapObj,
+					title: address.textContent
+				});
+
+				google.maps.event.addListener( marker, 'click', () => {
+					infowindow.open( mapObj, marker );
+				});
+			}
+		});
+
+
+		window.addEventListener( 'addressSwiped', () => {
+			let currentAddress = document.querySelector( '.swiper-slide-active address' );
+			if ( ! currentAddress.dataset.lng || ! currentAddress.dataset.lat )
+				return;
+
+			let active = new google.maps.LatLng({ lat: parseFloat( currentAddress.dataset.lat ), lng: parseFloat( currentAddress.dataset.lng ) });
+			mapObj.panTo( active );
+		});
 	}
 
 	// AutoComplete
@@ -110,11 +144,7 @@ export default class CloseIo_Maps {
 	}
 
 	// FillInAddresss
-	// ToDO: create additional marker
 	fillInAddress() {
-
-		// console.log( mapObj );
-		
 		if ( ! mapObj ) {
 			console.error( 'No map object in fillInAddress' );
 			return;
@@ -146,7 +176,9 @@ export default class CloseIo_Maps {
 		if ( place.geometry.viewport ) {
 			mapObj.fitBounds( place.geometry.viewport );
 			mapObj.setCenter( place.geometry.location );
-			// mapObj.setZoom( this.config.map.maxZoom );
+			
+			document.getElementById('lat').value = place.geometry.location.lat();
+			document.getElementById('lng').value = place.geometry.location.lng();
 		}
 
 		// let marker = new google.maps.Marker({

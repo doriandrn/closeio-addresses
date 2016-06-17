@@ -71,6 +71,7 @@ export default class CloseIo_Controller {
 				this.model.config.slider.onSlideChangeStart = ( swiper ) => {
 					me.counter.textContent = swiper.activeIndex + 1;
 					
+					window.dispatchEvent( new Event( 'addressSwiped' ) );
 					// A dat add si dupa a schimbat slide'u
 					// if ( this.state === "adding" ) {
 					// 	this.state = 'editing';
@@ -334,6 +335,9 @@ export default class CloseIo_Controller {
 
 							totalCounter.textContent = c - 1; 
 							
+							if ( c === parseInt( counter.textContent ) )
+								counter.textContent -= 1;
+
 							if ( c === 2 )
 								this.modal.classList.remove( 'modal__counter' );
 								
@@ -399,8 +403,14 @@ export default class CloseIo_Controller {
 
 					let fd = {},
 							formdata = new FormData( this.form );
-					for ( let [ key, value ] of formdata.entries() ) 
+					
+					if ( formdata.entries !== undefined )
+						for ( let [ key, value ] of formdata.entries() ) 
   						fd[ key ] = value;
+  				else {
+  					console.log( 'formdata not working here' );
+  					return;
+  				}
 					
 					// Ajax
 					let xhttp = new XMLHttpRequest();

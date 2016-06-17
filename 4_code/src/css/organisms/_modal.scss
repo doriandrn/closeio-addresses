@@ -6,6 +6,7 @@
 	padding: 20px;
 	height: 100%;
 	min-width: 320px;
+	min-height: 600px;
 	transition: padding .1s ease-in-out;
 
 	@include mq( 540px ) {
@@ -101,7 +102,7 @@
 		overflow: hidden;
 		opacity: 0;
 		visibility: hidden;
-		transition: right .15s ease-in-out, left .15s ease-in-out, opacity .15s ease-in-out;
+		transition: right .15s ease-in-out, left .15s ease-in-out, opacity .15s ease-in-out, top .1s ease-in-out;
 
 		#map {
 			size: 100%;
