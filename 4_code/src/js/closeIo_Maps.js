@@ -33,8 +33,6 @@ export default class CloseIo_Maps {
 		if ( ! address || address.classList.contains('none') )
 			return;
 
-		console.log( address );
-
 		if ( ! this.geocoder ) {
 			console.error( 'Geocoder failed to load.');
 			return;
@@ -46,6 +44,9 @@ export default class CloseIo_Maps {
 					if ( counter === this.activeIndex ) {
 						mapObj.setCenter( results[0].geometry.location );
 					}
+
+					address.dataset.lng = results[0].geometry.location.lng();
+					address.dataset.lat = results[0].geometry.location.lat();
 
 					let infowindow = new google.maps.InfoWindow({
 						content: '<div class="place_details">' + address + '</div>',
@@ -102,7 +103,9 @@ export default class CloseIo_Maps {
 		autocomplete = new google.maps.places.Autocomplete( ( document.getElementById( 'address' ) ), { types: ['geocode'] }),
 
 		autocomplete.bindTo( 'bounds', mapObj );
-		autocMarker = new google.maps.Marker();
+		autocMarker = new google.maps.Marker({
+			map: mapObj
+		});
 		autocomplete.addListener( 'place_changed', this.fillInAddress );
 	}
 
@@ -161,16 +164,16 @@ export default class CloseIo_Maps {
 		autocMarker.setPosition( place.geometry.location );
 		autocMarker.setVisible( true );
 
-		// let address = '';
+		// let add = '', addressmap;
 		// if ( place.address_components ) {
-		// 	address = [
+		// 	add = [
 		// 		(place.address_components[0] && place.address_components[0].short_name || ''),
 		// 		(place.address_components[1] && place.address_components[1].short_name || ''),
 		// 		(place.address_components[2] && place.address_components[2].short_name || '')
 		// 	].join(' ');
 		// }
 
-		// addressmap.infoWindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
+		// addressmap.infoWindow.setContent('<div><strong>' + place.name + '</strong><br>' + add);
 		// addressmap.infoWindow.open( mapObj, marker );
 		
 		window.dispatchEvent( new Event( 'addressInserted' ) );
