@@ -50,6 +50,7 @@ router
   .get( apiBase + '/:id', getAddress )
   .post( apiBase, addAddress )
   .post( apiBase + '/:id', updateAddress )
+  .put( apiBase, updateAddress )
   .put( apiBase + '/:id', updateAddress )
 
 
@@ -76,22 +77,26 @@ function *addAddress() {
 
 }
 
-function *updateAddress(id) {
-  if ( this.request.body.del ) {
-    // delete
-    this.body = yield this.mongo.db('closeio_addresses').collection('addresses').remove({"_id": new ObjectID( this.params.id ) }, true );
-    console.log('Address Removed');
-  } else {
-    //update
-    this.body = this.mongo.db('closeio_addresses').collection('addresses').update({"_id": new ObjectID( this.params.id ) }, this.body, { upsert: true }, ( err, result ) => {
-      if (err) 
-        return console.log(err)
-      console.log('Address Updated');
-    });
-    
-  }
+function *updateAddress() {
+  var _id;
+
+  if ( ! this.params.id ) {
+    _id = new ObjectID();
+    this.request.body._id = _id;
+  } else
+    _id = new ObjectID( this.params.id );
+
+  console.log( _id );
+  console.log( this.request.body );
+
+  if ( this.request.body.del )
+    this.body = yield this.mongo.db('closeio_addresses').collection('addresses').remove({"_id": _id }, true );
+  else
+    this.body = yield this.mongo.db('closeio_addresses').collection('addresses').update({"_id": _id }, this.request.body, { upsert: true })
+
   this.status = 200
-  this.redirect('/')
+ 
+  // this.redirect('/')
 }
 
 app

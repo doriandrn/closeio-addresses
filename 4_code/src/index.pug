@@ -44,8 +44,8 @@ block addressmodal
 						option.form__select__option(value='business') Business
 						option.form__select__option(value='mailing') Mailing
 						option.form__select__option(value='other') Other
-				.form__row
-					input#address.address__textarea(type="text" name="address" autofocus placeholder="Enter your address...")
+				.form__row.form__input__address
+					input#address(type="text" name="address" autofocus placeholder="Enter your address...")
 				fieldset.form__address
 					.form__row
 						input#street_number(type="text" placeholder="Address" name="street_number")

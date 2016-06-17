@@ -13,4 +13,25 @@
 			width: 100%;
 		}
 	}
+
+	&__input {
+		&__address {
+			position: relative;
+			margin-bottom: 50px;
+
+			&:before {
+				@include icon('\63');
+				font-size: 18px;
+				line-height: 46px;
+				color: rgba( black, .1 );
+				position: absolute;
+				top: 0;
+				left: 10px;
+			}
+
+			#address {
+				padding-left: 40px;
+			}
+		}
+	}
 }

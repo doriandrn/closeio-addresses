@@ -348,7 +348,7 @@ export default class CloseIo_Controller {
 						}
 					}
 
-					xhttp.open( 'POST', uri + '/' + address.id );
+					xhttp.open( 'PUT', uri + '/' + address.id );
 					xhttp.setRequestHeader( 'Content-Type', 'application/json; charset=utf-8' );
 					xhttp.send( JSON.stringify( address ) );
 				},
@@ -399,8 +399,8 @@ export default class CloseIo_Controller {
 
 					let fd = {},
 							formdata = new FormData( this.form );
-					for ( let [key, value] of formdata.entries() ) 
-  						fd[key] = value;
+					for ( let [ key, value ] of formdata.entries() ) 
+  						fd[ key ] = value;
 					
 					// Ajax
 					let xhttp = new XMLHttpRequest();
@@ -408,9 +408,11 @@ export default class CloseIo_Controller {
 					xhttp.onreadystatechange = () => {
 						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
 							let response = JSON.parse( xhttp.responseText );
+							console.log( response );
 							
 							if ( response.ok ) {
-								let id = response.electionId.replace(/['"]+/g, '' );
+								let id = response.upserted.length < 1 ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
+								console.log( 'newID: ' + id );
 
 								currentAddress.dataset.id = id; 
 								currentAddress.classList.remove( 'adding', 'none' );
@@ -441,8 +443,8 @@ export default class CloseIo_Controller {
 						}
 					}
 
-					xhttp.open( 'POST', uri );
-					xhttp.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+					xhttp.open( 'PUT', uri );
+					xhttp.setRequestHeader( 'Content-Type', 'application/json; charset=utf-8' );
 					xhttp.send( JSON.stringify( fd ) );
 				}
 			},
