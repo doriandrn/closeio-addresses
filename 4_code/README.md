@@ -13,4 +13,8 @@ Wait for message:
 URL to access the app:
 ``` http://localhost:3000 ```
 
-Side note: HTTP logger is activated to trace request / response methods ( and URIs ).
+Side notes: 
+- HTTP logger is activated to trace request / response methods ( and URIs );
+- If there are any issues throughout the compilation process, please make sure you have the lastet version of Node ( 4.4.5+ ) and npm ( 2.15.5+ );
+- An internet connection is required;
+- Server connects to a public mongo database - if requests happen to be slow sometimes. 
