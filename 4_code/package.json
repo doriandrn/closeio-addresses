@@ -7,7 +7,7 @@
     "server": "nodemon server.js",
     "dev": "webpack-dev-server --host localhost --port 3002 --config build/webpack.dev.conf.js --hot --inline --progress --colors --watch --hide-modules --content-base src/",
     "build": "rimraf dist && webpack --progress --hide-modules --config build/webpack.prod.conf.js",
-    "test": "karma start build/karma.conf.js --single-run",
+    "test": "karma start build/karma.conf.js --single-run"
   },
   "repository": {
     "type": "git",
