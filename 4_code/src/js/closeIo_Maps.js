@@ -2,12 +2,12 @@ let mapObj,
 		autocomplete,
 		autocMarker,
 		componentForm = {
-			street_number: 	'short_name',
-			route: 					'long_name',
-			locality: 			'long_name',
-			administrative_area_level_1: 'short_name',
-			country: 				'long_name',
-			postal_code: 		'short_name'
+			street_number: 								'short_name',
+			route: 												'long_name',
+			locality: 										'long_name',
+			administrative_area_level_1: 	'short_name',
+			country: 											'long_name',
+			postal_code: 									'short_name'
 		};
 
 export default class CloseIo_Maps {
@@ -17,7 +17,6 @@ export default class CloseIo_Maps {
 	}
 
 	init( activeIndex ) {
-
 		this.geocoder = new google.maps.Geocoder();
 		this.activeIndex = activeIndex + 1;
 		this.geolocate();
@@ -49,7 +48,7 @@ export default class CloseIo_Maps {
 					address.dataset.lat = results[0].geometry.location.lat();
 
 					let infowindow = new google.maps.InfoWindow({
-						content: '<div class="place_details">' + address + '</div>',
+						content: '<div class="place_details">' + address.textContent + '</div>',
 						size: new google.maps.Size(150, 50)
 					});
 
@@ -77,7 +76,7 @@ export default class CloseIo_Maps {
 				addresses = document.querySelectorAll( '.addresses address' ),
 				current = document.querySelector( '.swiper-slide-active address' ),
 				bounds = new google.maps.LatLngBounds(),
-				infowindow,
+				infowindow = new google.maps.InfoWindow(),
 				i = 0,
 				opts = {
 					zoom: this.config.map.maxZoom,
@@ -106,12 +105,20 @@ export default class CloseIo_Maps {
 					title: address.textContent
 				});
 
+				bounds.extend( marker.getPosition() );
+
+				infowindow = new google.maps.InfoWindow({
+					content: '<div class="place_details">' + address.textContent + '</div>',
+					size: new google.maps.Size(150, 50)
+				});
+
 				google.maps.event.addListener( marker, 'click', () => {
 					infowindow.open( mapObj, marker );
 				});
 			}
 		});
 
+		mapObj.fitBounds(bounds);
 
 		window.addEventListener( 'addressSwiped', () => {
 			let currentAddress = document.querySelector( '.swiper-slide-active address' );
@@ -186,13 +193,13 @@ export default class CloseIo_Maps {
 		// 	map: mapObj
 		// });
 
-		autocMarker.setIcon(/** @type {google.maps.Icon} */({
-			url: place.icon,
-			size: new google.maps.Size(71, 71),
-			origin: new google.maps.Point(0, 0),
-			anchor: new google.maps.Point(17, 34),
-			scaledSize: new google.maps.Size(35, 35)
-		}));
+		// autocMarker.setIcon(/** @type {google.maps.Icon} */({
+		// 	url: place.icon,
+		// 	size: new google.maps.Size(71, 71),
+		// 	origin: new google.maps.Point(0, 0),
+		// 	anchor: new google.maps.Point(17, 34),
+		// 	scaledSize: new google.maps.Size(35, 35)
+		// }));
 		autocMarker.setPosition( place.geometry.location );
 		autocMarker.setVisible( true );
 

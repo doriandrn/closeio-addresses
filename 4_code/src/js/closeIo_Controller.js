@@ -69,13 +69,6 @@ export default class CloseIo_Controller {
 		return fd;
 	}
 
-	formValid() {
-		if ( ! this.model.config.ajax || ! this.validateInput( input ) )
-			return false;
-
-		return true;
-	}
-
 	// empty input or too short
 	validateInput( input ) {
 		if ( input.value.length < 4 ) {
@@ -426,12 +419,17 @@ export default class CloseIo_Controller {
 				},
 
 				'update': () => {
-					if ( ! this.formValid )
-						return;
-					else
+					if ( ! this.validateInput( input ) ) {
 						event.preventDefault();
-
+						return;
+					}
+					
 					// Ajax
+					if ( ! this.model.config.ajax )
+						return;
+
+					event.preventDefault();
+
 					let xhttp = new XMLHttpRequest(),
 							fd = this.formData;
 
@@ -443,37 +441,24 @@ export default class CloseIo_Controller {
 							let response = JSON.parse( xhttp.responseText );
 							console.log( response );
 							
-							// if ( response.ok ) {
-							// 	let id = response.upserted.length < 1 ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
-							// 	console.log( 'newID: ' + id );
+							if ( response.ok ) {
+								this.modal.classList.remove('map--fetched');
+								this.modal.classList.add('map--fetched--full');
 
-							// 	currentAddress.dataset.id = id; 
-							// 	currentAddress.classList.remove( 'adding', 'none' );
+								_.each( fd, ( value, key ) => {
+									switch( key ) {
+										default: 
+											currentAddress.dataset[ key ] = value;
+											break;
 
-							// 	this.state = 'editing';
+										case 'address':
+											currentAddress.textContent = value;
+											break;
+									}
+								});
 
-							// 	this.modal.classList.remove('map--fetched');
-							// 	this.modal.classList.add('map--fetched--full');
-
-							// 	this.updateRemoveFormActionId( id );
-
-							// 	_.each( fd, ( value, key ) => {
-							// 		switch( key ) {
-							// 			default: 
-							// 				currentAddress.dataset[ key ] = value;
-							// 				break;
-
-							// 			case 'address':
-							// 				currentAddress.textContent = value;
-							// 				break;
-							// 		}
-							// 	});
-
-							// 	if ( totalCounter === 1 )
-							// 		slider.removeSlide( 1 );
-
-							// 	this.updateMap();
-							// }
+								this.updateMap();
+							}
 						}
 					}
 
@@ -510,10 +495,15 @@ export default class CloseIo_Controller {
 
 				// Save for ADD NEW
 				'save': () => {
-					if ( ! this.formValid )
-						return;
-					else
+					if ( ! this.validateInput( input ) ) {
 						event.preventDefault();
+						return;
+					}
+					
+					if ( ! this.model.config.ajax )
+						return;
+
+					event.preventDefault();
 
 					delete next.dataset.action;
 					
@@ -530,7 +520,7 @@ export default class CloseIo_Controller {
 							console.log( response );
 							
 							if ( response.ok ) {
-								let _id = response.upserted.length < 1 ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
+								let _id = response.upserted ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
 
 								currentAddress.dataset.id = _id; 
 								currentAddress.classList.remove( 'adding', 'none' );
