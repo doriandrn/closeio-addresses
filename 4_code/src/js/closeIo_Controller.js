@@ -64,8 +64,6 @@ export default class CloseIo_Controller {
 			});
 		}
 
-		console.log( fd );
-
 		return fd;
 	}
 
@@ -111,16 +109,10 @@ export default class CloseIo_Controller {
 				};		
 				this.model.config.slider.onSlideChangeStart = ( swiper ) => {
 					me.counter.textContent = swiper.activeIndex + 1;
-					
-					window.dispatchEvent( new Event( 'addressSwiped' ) );
-					// A dat add si dupa a schimbat slide'u
-					// if ( this.state === "adding" ) {
-					// 	this.state = 'editing';
-					// 	// toggle map-fetched state
-					// }
-					// else
+
 					this.updateFormData( this.state );
-					this.updateRemoveFormActionId();
+					this.updateRemoveFormActionId( );
+					window.dispatchEvent( new Event( 'addressSwiped' ) );
 				};
 			},
 
@@ -209,8 +201,8 @@ export default class CloseIo_Controller {
 
 	// update actionID for remove form
 	updateRemoveFormActionId( id ) {
-		if ( typeof id === undefined )
-			id = this.model.currentAddress.id;
+		if ( typeof id === undefined || ! id )
+			id = this.model.currentAddress.current.dataset.id;
 		
 		if ( ! id )
 			return;
@@ -504,6 +496,8 @@ export default class CloseIo_Controller {
 
 				// Save for ADD NEW
 				'save': () => {
+					this.state = 'editing';
+
 					if ( ! this.validateInput( input ) ) {
 						event.preventDefault();
 						return;
@@ -569,7 +563,6 @@ export default class CloseIo_Controller {
 			toggle = actionName.indexOf( 'cancel-' ) > -1 ? false : true; 
 	
 		actionName = actionName.replace( 'cancel-', '' );
-		console.log( actionName );
 		
 		if ( actionName == 'switch--tag' )
 			toggle = event.target;

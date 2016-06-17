@@ -1,6 +1,7 @@
 let mapObj, 
 		autocomplete,
 		autocMarker,
+		markers,
 		componentForm = {
 			street_number: 								'short_name',
 			route: 												'long_name',
@@ -178,6 +179,8 @@ export default class CloseIo_Maps {
 
 		if ( place.geometry.viewport ) {
 			
+			console.log( 'treaba e buna' );
+
 			setTimeout( () => {
 				window.dispatchEvent( new Event( 'resize' ) );
 				mapObj.fitBounds( place.geometry.viewport );
