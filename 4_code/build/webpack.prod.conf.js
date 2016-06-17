@@ -8,7 +8,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 config.output.filename = '[name].js'
 config.output.chunkFilename = '[id].[chunkhash].js'
 
-var SOURCE_MAP = true
+var SOURCE_MAP = false
 
 config.devtool = SOURCE_MAP ? 'source-map' : false
 
@@ -32,13 +32,15 @@ config.plugins = (config.plugins || []).concat([
   new HtmlWebpackPlugin({
     title: 'Address Modal',
     template: 'src/index.pug',
-    filename: 'index.html'
+    filename: 'index.html',
+    inject: false
   }),
-  // new webpack.optimize.UglifyJsPlugin({
-  //   compress: {
-  //     warnings: false
-  //   }
-  // }),
+
+  new webpack.optimize.UglifyJsPlugin({
+    compress: {
+      warnings: true
+    }
+  }),
 ])
 
 module.exports = config

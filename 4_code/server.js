@@ -1,22 +1,17 @@
 const koa           = require('koa')
-// const koaBody       = require('koa-body')({json:true})
 const koaBody       = require('koa-bodyparser')
-// const koaBody       = require('koa-better-body')
 const Pug           = require('koa-pug')
 const app           = koa()
-// const server        = koa()
-// const serve         = require('koa-static');
 const router        = require('koa-router')()
 const mongo         = require('koa-mongo')
-// const views         = require('koa-views')
 const compose       = require('koa-compose')
-const common        = require('koa-common');
+const common        = require('koa-common')
 const webpack       = require('webpack')
 const config        = require('./build/webpack.dev.conf')
 const compiler      = webpack(config);
 const historyApiFallback = require('koa-history-api-fallback');
 const webpackMiddleware = require("koa-webpack-dev-middleware")
-// var webpackDevServer = require('koa-webpack-dev');
+
 var addresses,
     ObjectID = require('mongodb').ObjectID,
     apiBase = '/api/lead/id/addresses';
@@ -73,8 +68,9 @@ function *addAddress() {
 
   this.body = yield this.mongo.db('closeio_addresses').collection('addresses').save( this.request.body );
   this.status = 200
+  
+  // if ! ajax
   // this.redirect('/')
-
 }
 
 function *updateAddress() {

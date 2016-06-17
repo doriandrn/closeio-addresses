@@ -370,6 +370,12 @@ export default class CloseIo_Controller {
 
 					event.preventDefault();
 
+					// wait for current remove to complete and receive a server response
+					if ( this.state == 'removing' )
+						return;
+
+					this.state = 'removing';
+
 					let address = {
 						del: true,
 						id: id
@@ -380,6 +386,9 @@ export default class CloseIo_Controller {
 					xhttp.onreadystatechange = () => {
 						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
 							this.slider.removeSlide( this.activeIndex );
+							setTimeout( () => {
+								this.state = 'editing';
+							}, 150 );
 							
 							let c = parseInt( totalCounter.textContent );
 							console.log( 'c: ' + c );
