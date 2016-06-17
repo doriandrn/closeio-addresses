@@ -21,6 +21,7 @@
   "author": "Dorian Tudorache",
   "license": "UNLICENSED",
   "devDependencies": {
+    "autoprefixer": "^6.3.6",
     "babel-core": "^6.0.0",
     "babel-eslint": "^6.0.4",
     "babel-loader": "^6.0.0",
