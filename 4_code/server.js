@@ -83,7 +83,7 @@ function *updateAddress() {
     _id = new ObjectID( this.params.id );
 
   this.body = this.request.body.del ? yield this.mongo.db('closeio_addresses').collection('addresses').remove({"_id": _id }, true ) : yield this.mongo.db('closeio_addresses').collection('addresses').update({"_id": _id }, this.request.body, { upsert: true });
-  this.status = 200
+  // this.status = 200
  
   // if ! ajax
   // this.redirect('/')

@@ -485,6 +485,7 @@ export default class CloseIo_Controller {
 							}
 
 							this.modal.dispatchEvent( new CustomEvent( 'addressRemoved', { detail: { index: this.activeIndex } } ) );
+							this.updateRemoveFormActionId();
 
 							setTimeout( () => {
 								this.updateMap();
@@ -616,7 +617,8 @@ export default class CloseIo_Controller {
 							console.log( response );
 							
 							if ( response.ok ) {
-								let _id = response.upserted ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
+								let _id = ! response.upserted ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
+								console.log( _id );
 
 								currentAddress.dataset.id = _id; 
 								currentAddress.classList.remove( 'adding', 'none' );

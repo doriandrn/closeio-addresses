@@ -31,16 +31,20 @@ export default class CloseIo_Maps {
 	}
 
 	// Adds a marker to the map and push to the array.
-	addMarker( address, name ) {
+	addMarker( address, name = '', ret = false, unshift = false ) {
 	  let marker = new google.maps.Marker({
 	    position: address,
 	    label: name,
 	    map: mapObj,
 	  });
 
-	  markers.push( marker );
+	 	if ( unshift )
+	 		markers.unshift( marker );
+	 	else
+	  	markers.push( marker );
 
-	  return marker;
+	  if ( ret )
+	  	return marker;
 	}
 
 	// Sets the map on all markers in the array.
@@ -140,7 +144,7 @@ export default class CloseIo_Maps {
 				setTimeout( this.geocodeAddress( address, i ), 250 );
 			} else {
 				let position = new google.maps.LatLng( { lat: parseFloat( address.dataset.lat ), lng: parseFloat( address.dataset.lng ) } ),
-						marker = this.addMarker( position, address.textContent );
+						marker = this.addMarker( position, address.textContent, true );
 
 
 				bounds.extend( marker.getPosition() );
@@ -150,6 +154,8 @@ export default class CloseIo_Maps {
 				// });
 			}
 		});
+
+		// markers.reverse();
 
 		if ( current.dataset.lat && current.dataset.lng )
 			mapObj.setCenter( new google.maps.LatLng( { lat: parseFloat( current.dataset.lat ), lng: parseFloat( current.dataset.lng ) } ) );
@@ -161,7 +167,7 @@ export default class CloseIo_Maps {
 		mapObj.setZoom( opts.zoom ); 
 
 		mapObj.addListener( 'click', ( e ) => {
-    	this.addMarker( e.latLng );
+    	this.addMarker( e.latLng, '', false, true );
     	
     	let lat = e.latLng.lat(),
     			lng = e.latLng.lng();
@@ -177,24 +183,26 @@ export default class CloseIo_Maps {
 			    }
 		    }));
     	});
-
-    	
   	});
 
 		modal.addEventListener( 'cancelAddNew' , ( e ) => {
-			this.clearMarkers();
-			let l = markers.length;
+			// this.clearMarkers();
+			// let l = markers.length;
 			markers[ l-1 ].setMap( null );
 			markers.splice( -1 ); // cut the last item
-			this.setMapOnAll();
+			// this.setMapOnAll();
 		});
 
 		modal.addEventListener( 'addressRemoved', ( e ) => {
-			this.clearMarkers();
-			let i = e.detail.index;
+			// this.clearMarkers();
+			let i = e.detail.index,
+					l = markers.length - 1;
+
+			console.log( i, markers );
 			markers[ i ].setMap( null );
 			markers.splice( i, 1 );
-			this.setMapOnAll();
+			console.log( i, markers );
+			// this.setMapOnAll();
 		});
 
 		modal.addEventListener( 'addressSwiped', () => {
@@ -218,9 +226,6 @@ export default class CloseIo_Maps {
 		autocomplete = new google.maps.places.Autocomplete( ( document.getElementById( 'address' ) ), { types: ['geocode'] }),
 
 		autocomplete.bindTo( 'bounds', mapObj );
-		autocMarker = new google.maps.Marker({
-			map: mapObj
-		});
 		autocomplete.addListener( 'place_changed', this.fillInAddress );
 	}
 
@@ -266,12 +271,16 @@ export default class CloseIo_Maps {
 			
 			document.getElementById('lat').value = place.geometry.location.lat();
 			document.getElementById('lng').value = place.geometry.location.lng();
+
+			let marker = new google.maps.Marker({
+				position: place.geometry.location,
+				map: mapObj
+			});
+
+			markers.unshift( marker );
 		}
 
-		// let marker = new google.maps.Marker({
-		// 	position: place.geometry.location,
-		// 	map: mapObj
-		// });
+		
 
 		// autocMarker.setIcon(/** @type {google.maps.Icon} */({
 		// 	url: place.icon,
