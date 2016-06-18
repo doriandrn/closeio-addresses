@@ -32,18 +32,11 @@ export default class CloseIo_Maps {
 
 	// Adds a marker to the map and push to the array.
 	addMarker( address, name ) {
-		// let infowindow = google.maps.InfoWindow({
-  //   	content: '<div class="place_details">' + name + '</div>',
-  //   	size: new google.maps.Size( 150, 50 )
-		// });
-
 	  let marker = new google.maps.Marker({
 	    position: address,
+	    label: name,
 	    map: mapObj,
-	    // infoWindow: infowindow
 	  });
-
-	  // infowindow.open( mapObj, marker );
 
 	  markers.push( marker );
 
@@ -51,20 +44,20 @@ export default class CloseIo_Maps {
 	}
 
 	// Sets the map on all markers in the array.
-	setMapOnAll( map ) {
+	setMapOnAll() {
 	  _.each( markers, ( marker ) => {
-	    marker.setMap( map );
+	    marker.setMap( mapObj );
 	  });
 	}
 
 	// Removes the markers from the map, but keeps them in the array.
 	clearMarkers() {
-	  setMapOnAll( null );
+	  this.setMapOnAll( null );
 	}
 
 	// Shows any markers currently in the array.
 	showMarkers() {
-	  setMapOnAll( mapObj );
+	  this.setMapOnAll( mapObj );
 	}
 
 	// Deletes all markers in the array by removing references to them.
@@ -138,12 +131,8 @@ export default class CloseIo_Maps {
 
 
 		mapObj = new google.maps.Map( this.map, opts );
+
 		
-		console.log( current );
-
-		if ( current.dataset.lat && current.dataset.lng )
-			mapObj.setCenter( new google.maps.LatLng( { lat: parseFloat( current.dataset.lat ), lng: parseFloat( current.dataset.lng ) } ) );
-
 		// add markers or geocode them if no lat lng specified for addresss
 		_.each( addresses, ( address ) => {
 			i += 1;
@@ -162,9 +151,14 @@ export default class CloseIo_Maps {
 			}
 		});
 
-		mapObj.fitBounds( bounds );
+		if ( current.dataset.lat && current.dataset.lng )
+			mapObj.setCenter( new google.maps.LatLng( { lat: parseFloat( current.dataset.lat ), lng: parseFloat( current.dataset.lng ) } ) );
+		else {
+			mapObj.fitBounds( bounds );
+			mapObj.setCenter( bounds.getCenter() );
+		}
+			
 		mapObj.setZoom( opts.zoom ); 
-		mapObj.setCenter( bounds.getCenter() );
 
 		mapObj.addListener( 'click', ( e ) => {
     	this.addMarker( e.latLng );
@@ -187,8 +181,16 @@ export default class CloseIo_Maps {
     	
   	});
 
-		modal.addEventListener( 'canceledAddNew ', () => {
-			console.log( 'cancelaRIE' );
+		modal.addEventListener( 'cancelAddNew' , ( e ) => {
+			this.clearMarkers();
+			markers.splice( -1 ); // cut the last item
+			this.setMapOnAll();
+		});
+
+		modal.addEventListener( 'addressRemoved', ( e ) => {
+			this.clearMarkers();
+			markers.splice( e.detail.index, 1 );
+			this.setMapOnAll();
 		});
 
 		modal.addEventListener( 'addressSwiped', () => {
@@ -274,8 +276,8 @@ export default class CloseIo_Maps {
 		// 	anchor: new google.maps.Point(17, 34),
 		// 	scaledSize: new google.maps.Size(35, 35)
 		// }));
-		autocMarker.setPosition( place.geometry.location );
-		autocMarker.setVisible( true );
+		// autocMarker.setPosition( place.geometry.location );
+		// autocMarker.setVisible( true );
 
 		// let add = '', addressmap;
 		// if ( place.address_components ) {

@@ -239,7 +239,7 @@ export default class CloseIo_Controller {
 				this.model.currentAddress.current.dataset.lat = position.lat;
 			}
 			if ( position.lng ) {
-				document.getElementById( 'lng' ).value = position.lat || "";
+				document.getElementById( 'lng' ).value = position.lng;
 				this.model.currentAddress.current.dataset.lng = position.lng;
 			}
 			
@@ -265,10 +265,11 @@ export default class CloseIo_Controller {
 	updateMap() {
 		// updates map size & centers position - wait for anim .15s
 		window.dispatchEvent( new Event( 'resize' ) );
+		this.modal.dispatchEvent( new Event( 'addressSwiped' ) );
 
-		setTimeout( () => {
-			this.modal.dispatchEvent( new Event( 'addressSwiped' ) );
-		}, 150 );
+		// setTimeout( () => {
+		// 	this.modal.dispatchEvent( new Event( 'addressSwiped' ) );
+		// }, 150 );
 	}
 
 	// update actionID for remove form
@@ -293,8 +294,6 @@ export default class CloseIo_Controller {
 				select = form.querySelector( 'select.form__select' ),
 				submit = form.querySelector( 'input[type=submit]' ),
 				cancel = document.querySelector( '.modal__cancel button' );
-
-		console.log( 'State: ' + state + ' -- put: ' + put );
 
 		if ( ! submit || ! cancel || ! select ) {
 			console.error( 'Form is broken.' );
@@ -401,7 +400,6 @@ export default class CloseIo_Controller {
 							currentAddress.classList.add( 'adding' );
 							currentAddress.textContent = 'Adding new';
 						}
-
 						
 						// Clear the value
 						input.value = '';
@@ -415,7 +413,7 @@ export default class CloseIo_Controller {
 					// CANCEL ADD NEW
 					} else {
 
-						modal.dispatchEvent( new CustomEvent( 'canceledAddNew' ) );
+						modal.dispatchEvent( new CustomEvent( 'cancelAddNew' ) );
 
 						modal.classList.remove( 'not-empty', 'map--fetched' );
 						delete next.dataset.action;
@@ -432,6 +430,10 @@ export default class CloseIo_Controller {
 						}
 
 						this.state = 'editing';
+
+						setTimeout( () => { 
+							this.updateMap(); 
+						}, 150 );
 					}
 
 					// this.updateFormData( this.state );
@@ -481,6 +483,8 @@ export default class CloseIo_Controller {
 									'<div class="address__slide swiper-slide"><address class="address tag none">' + none + '</address></div>'
 								]);
 							}
+
+							this.modal.dispatchEvent( new CustomEvent( 'addressRemoved', { detail: { index: this.activeIndex } } ) );
 
 							setTimeout( () => {
 								this.updateMap();
@@ -545,7 +549,9 @@ export default class CloseIo_Controller {
 									}
 								});
 
-								this.updateMap();
+								setTimeout( () => {
+									this.updateMap();
+								}, 150 );
 							}
 						}
 					}
