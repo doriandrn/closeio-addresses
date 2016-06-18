@@ -15,6 +15,7 @@ let mapObj,
 export default class CloseIo_Maps {
 	constructor( config ) {
 		this.config = config;
+		this.modal = document.querySelector( '.modal__address' );
 	}
 
 	init( activeIndex ) {
@@ -124,7 +125,7 @@ export default class CloseIo_Maps {
 	// Map
 	makeMap() {
 		let 
-				modal = document.querySelector( '.modal__address' ),
+				modal = this.modal,
 				addresses = modal.querySelectorAll( '.addresses address' ),
 				current = modal.querySelector( '.swiper-slide-active address' ),
 				bounds = new google.maps.LatLngBounds(),
@@ -162,8 +163,8 @@ export default class CloseIo_Maps {
 		});
 
 		mapObj.fitBounds( bounds );
-		mapObj.setCenter( bounds.getCenter() );
 		mapObj.setZoom( opts.zoom ); 
+		mapObj.setCenter( bounds.getCenter() );
 
 		mapObj.addListener( 'click', ( e ) => {
     	this.addMarker( e.latLng );
@@ -288,7 +289,7 @@ export default class CloseIo_Maps {
 		// addressmap.infoWindow.setContent('<div><strong>' + place.name + '</strong><br>' + add);
 		// addressmap.infoWindow.open( mapObj, marker );
 		
-		window.dispatchEvent( new Event( 'addressInserted' ) );
+		document.querySelector( '.modal__address' ).dispatchEvent( new Event( 'addressInserted' ) );
 	}
 
 	geolocate() {

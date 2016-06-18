@@ -170,21 +170,34 @@ export default class CloseIo_Controller {
 	}
 
 	events( binder ) {
-		let input = this.model.currentAddress.input,
-				next  = this.modal.querySelector( '.address__next' );
+		let modal = this.modal,
+				input = this.model.currentAddress.input,
+				next  = modal.querySelector( '.address__next' );
 
 		binder.addEventListener( 'addressInserted', ( e ) => {
 			console.log( 'Got address!' );
-			this.modal.classList.add( 'map--fetched' );
+			modal.classList.add( 'map--fetched' );
 			input.classList.remove( 'invalid' );
 
 		});
 
+
 		binder.addEventListener( 'addNew', ( e ) => {
 			let totalCounter 	= this.modalElements.totalCounter,
-					results 			= e.detail.results;
+					results 			= e.detail.results,
+					position			= {
+						lat: e.detail.lat,
+						lng: e.detail.lng
+					};
 
-			console.log( e.detail );
+
+			if ( ! results ) {
+				console.info( 'Geocode failed' );
+				return;
+			}
+			
+			console.log( results );
+
 			this.modal.classList.remove( 'map--fetched--full' );
 			this.modal.classList.add( 'map--fetched' );
 
@@ -213,9 +226,28 @@ export default class CloseIo_Controller {
 						// 	currentAddress.textContent = 'Adding new';
 						// }
 
-			input.value = results.formatted_address;
+			_.each( results.address_components, ( component ) => {
+				if ( component.types[0] ) {
+					let el = document.getElementById( component.types[0] );
+					if ( el )
+						el.value = component.long_name || component.short_name;
+				}
+			});
 
-			this.updateMap();
+			if ( position.lat ) {
+				document.getElementById( 'lat' ).value = position.lat;
+				this.model.currentAddress.current.dataset.lat = position.lat;
+			}
+			if ( position.lng ) {
+				document.getElementById( 'lng' ).value = position.lat || "";
+				this.model.currentAddress.current.dataset.lng = position.lng;
+			}
+			
+			input.value = results.formatted_address || "";
+
+			setTimeout( () => {
+				this.updateMap();
+			}, 150 );
 		});
 
 		binder.addEventListener( 'click', ( e ) => {
@@ -233,8 +265,9 @@ export default class CloseIo_Controller {
 	updateMap() {
 		// updates map size & centers position - wait for anim .15s
 		window.dispatchEvent( new Event( 'resize' ) );
+
 		setTimeout( () => {
-			window.dispatchEvent( new Event( 'addressSwiped' ) );
+			this.modal.dispatchEvent( new Event( 'addressSwiped' ) );
 		}, 150 );
 	}
 
@@ -449,6 +482,10 @@ export default class CloseIo_Controller {
 								]);
 							}
 
+							setTimeout( () => {
+								this.updateMap();
+							}, 150 );
+
 						}
 					}
 
@@ -464,7 +501,9 @@ export default class CloseIo_Controller {
 					modal.classList.toggle( 'map--fetched--full', ! toggle );
 					modal.classList.toggle( 'map--fetched', toggle );
 					this.updateFormData( this.state );
-					this.updateMap();
+					setTimeout( () => {
+						this.updateMap();
+					}, 150 );
 				},
 
 				'update': () => {
