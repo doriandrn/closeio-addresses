@@ -1,7 +1,8 @@
-let mapObj, 
+let mapObj,
 		autocomplete,
 		autocMarker,
-		markers,
+		markers = [],
+		infowindow,
 		componentForm = {
 			street_number: 								'short_name',
 			route: 												'long_name',
@@ -12,7 +13,6 @@ let mapObj,
 		};
 
 export default class CloseIo_Maps {
-	
 	constructor( config ) {
 		this.config = config;
 	}
@@ -26,8 +26,69 @@ export default class CloseIo_Maps {
 	}
 
 	get map() {
-		return document.getElementById('map');
-	} 
+		return document.getElementById( 'map' );
+	}
+
+	// Adds a marker to the map and push to the array.
+	addMarker( address, name ) {
+		// let infowindow = google.maps.InfoWindow({
+  //   	content: '<div class="place_details">' + name + '</div>',
+  //   	size: new google.maps.Size( 150, 50 )
+		// });
+
+	  let marker = new google.maps.Marker({
+	    position: address,
+	    map: mapObj,
+	    // infoWindow: infowindow
+	  });
+
+	  // infowindow.open( mapObj, marker );
+
+	  markers.push( marker );
+
+	  return marker;
+	}
+
+	// Sets the map on all markers in the array.
+	setMapOnAll( map ) {
+	  _.each( markers, ( marker ) => {
+	    marker.setMap( map );
+	  });
+	}
+
+	// Removes the markers from the map, but keeps them in the array.
+	clearMarkers() {
+	  setMapOnAll( null );
+	}
+
+	// Shows any markers currently in the array.
+	showMarkers() {
+	  setMapOnAll( mapObj );
+	}
+
+	// Deletes all markers in the array by removing references to them.
+	deleteMarkers() {
+	  this.clearMarkers();
+	  markers = [];
+	}
+
+	codeLatLng( lat, lng, callback ) {
+	  this.geocoder.geocode({
+	    'latLng': new google.maps.LatLng( lat, lng ),
+	  }, ( results, status ) => {
+	    if ( status === google.maps.GeocoderStatus.OK )
+	      callback( results[0] );
+	    else
+	      callback( null );
+	  });
+	}
+
+	gotData( geocodeData ) {
+		if ( ! geocodeData )
+			return 'Could not geocode address'
+
+		return geocodeData;
+	}
 
 	geocodeAddress( address, counter ) {
 		if ( ! address || address.classList.contains('none') )
@@ -45,22 +106,11 @@ export default class CloseIo_Maps {
 						mapObj.setCenter( results[0].geometry.location );
 					}
 
-					address.dataset.lng = results[0].geometry.location.lng();
-					address.dataset.lat = results[0].geometry.location.lat();
+					// address.dataset.lng = results[0].geometry.location.lng();
+					// address.dataset.lat = results[0].geometry.location.lat();
 
-					let infowindow = new google.maps.InfoWindow({
-						content: '<div class="place_details">' + address.textContent + '</div>',
-						size: new google.maps.Size(150, 50)
-					});
-
-					let marker = new google.maps.Marker({
-						position: results[0].geometry.location,
-						map: mapObj,
-						title: address.textContent
-					});
-					google.maps.event.addListener( marker, 'click', () => {
-						infowindow.open( mapObj, marker) ;
-					});
+					// this.addMarker( results[0].geometry.location, address.textContent );
+					
 
 				} else {
 					console.info( "Geocoder - No results found." );
@@ -74,8 +124,9 @@ export default class CloseIo_Maps {
 	// Map
 	makeMap() {
 		let 
-				addresses = document.querySelectorAll( '.addresses address' ),
-				current = document.querySelector( '.swiper-slide-active address' ),
+				modal = document.querySelector( '.modal__address' ),
+				addresses = modal.querySelectorAll( '.addresses address' ),
+				current = modal.querySelector( '.swiper-slide-active address' ),
 				bounds = new google.maps.LatLngBounds(),
 				infowindow = new google.maps.InfoWindow(),
 				i = 0,
@@ -86,48 +137,67 @@ export default class CloseIo_Maps {
 
 
 		mapObj = new google.maps.Map( this.map, opts );
+		
+		console.log( current );
+
 		if ( current.dataset.lat && current.dataset.lng )
 			mapObj.setCenter( new google.maps.LatLng( { lat: parseFloat( current.dataset.lat ), lng: parseFloat( current.dataset.lng ) } ) );
 
 		// add markers or geocode them if no lat lng specified for addresss
 		_.each( addresses, ( address ) => {
 			i += 1;
-
 			if ( ! address.dataset.lat || ! address.dataset.lng ) {
 				setTimeout( this.geocodeAddress( address, i ), 250 );
-			}
-
-			else {
+			} else {
 				let position = new google.maps.LatLng( { lat: parseFloat( address.dataset.lat ), lng: parseFloat( address.dataset.lng ) } ),
-				
-				marker = new google.maps.Marker({
-					position: position,
-					map: mapObj,
-					title: address.textContent
-				});
+						marker = this.addMarker( position, address.textContent );
+
 
 				bounds.extend( marker.getPosition() );
 
-				infowindow = new google.maps.InfoWindow({
-					content: '<div class="place_details">' + address.textContent + '</div>',
-					size: new google.maps.Size(150, 50)
-				});
-
-				google.maps.event.addListener( marker, 'click', () => {
-					infowindow.open( mapObj, marker );
-				});
+				// google.maps.event.addListener( marker, 'click', () => {
+					// infowindow.open( mapObj, marker );
+				// });
 			}
 		});
 
-		mapObj.fitBounds(bounds);
+		mapObj.fitBounds( bounds );
+		mapObj.setCenter( bounds.getCenter() );
+		mapObj.setZoom( opts.zoom ); 
 
-		window.addEventListener( 'addressSwiped', () => {
+		mapObj.addListener( 'click', ( e ) => {
+    	this.addMarker( e.latLng );
+    	
+    	let lat = e.latLng.lat(),
+    			lng = e.latLng.lng();
+    			
+    	this.codeLatLng( lat, lng, ( res ) => {
+    		let	results = res ? res : 'Address not geocoded.' ;
+
+		    modal.dispatchEvent( new CustomEvent( 'addNew', {
+		    	detail: {
+			    	lat: lat,
+			    	lng: lng,
+			    	results: results,
+			    }
+		    }));
+    	});
+
+    	
+  	});
+
+		modal.addEventListener( 'canceledAddNew ', () => {
+			console.log( 'cancelaRIE' );
+		});
+
+		modal.addEventListener( 'addressSwiped', () => {
 			let currentAddress = document.querySelector( '.swiper-slide-active address' );
 			if ( ! currentAddress.dataset.lng || ! currentAddress.dataset.lat )
 				return;
 
 			let active = new google.maps.LatLng({ lat: parseFloat( currentAddress.dataset.lat ), lng: parseFloat( currentAddress.dataset.lng ) });
 			mapObj.panTo( active );
+			mapObj.setZoom( opts.zoom ); 
 		});
 	}
 

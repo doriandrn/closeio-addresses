@@ -92,7 +92,7 @@ export default class CloseIo_Controller {
 		let init = {
 			counter: () => {
 				if ( parseInt( this.modalElements.totalCounter ) > 1 )
-					this.modal.classList.add( 'modal__counter' );
+					modal.classList.add( 'modal__counter' );
 			},
 
 			// Init the slider events
@@ -112,7 +112,7 @@ export default class CloseIo_Controller {
 
 					this.updateFormData( this.state );
 					this.updateRemoveFormActionId( );
-					window.dispatchEvent( new Event( 'addressSwiped' ) );
+					modal.dispatchEvent( new Event( 'addressSwiped' ) );
 				};
 			},
 
@@ -166,20 +166,59 @@ export default class CloseIo_Controller {
 		init.tags( this.form );
 		
 		// Click actions & events
-		this.clickers();
-		this.events();
+		this.events( modal );
 	}
 
-	events() {
-		window.addEventListener( 'addressInserted', ( e ) => {
+	events( binder ) {
+		let input = this.model.currentAddress.input,
+				next  = this.modal.querySelector( '.address__next' );
+
+		binder.addEventListener( 'addressInserted', ( e ) => {
 			console.log( 'Got address!' );
 			this.modal.classList.add( 'map--fetched' );
-			this.model.currentAddress.input.classList.remove( 'invalid' );
-		});
-	}
+			input.classList.remove( 'invalid' );
 
-	clickers() {
-		this.modal.addEventListener( 'click', ( e ) => {
+		});
+
+		binder.addEventListener( 'addNew', ( e ) => {
+			let totalCounter 	= this.modalElements.totalCounter,
+					results 			= e.detail.results;
+
+			console.log( e.detail );
+			this.modal.classList.remove( 'map--fetched--full' );
+			this.modal.classList.add( 'map--fetched' );
+
+			this.state = 'adding';
+			input.classList.remove( 'invalid' );
+
+			let tc = parseInt( totalCounter.textContent );
+			totalCounter.textContent = tc + 1;
+
+			// Add new slide
+			if ( tc > 0 ) {
+				this.slider.prependSlide([
+					'<div class="address__slide swiper-slide"><address class="address adding tag">Adding New</address></div>'
+				]);
+				this.slider.slideTo(0);
+			}
+
+			next.dataset.action = 'cancel-add-new';
+
+			if ( tc === 1 )
+				modal.classList.add( 'modal__counter' );
+
+						// if ( currentAddress.classList.contains( 'none') ) {
+						// 	currentAddress.classList.remove( 'none' );
+						// 	currentAddress.classList.add( 'adding' );
+						// 	currentAddress.textContent = 'Adding new';
+						// }
+
+			input.value = results.formatted_address;
+
+			this.updateMap();
+		});
+
+		binder.addEventListener( 'click', ( e ) => {
 			let target = e.target,
 			    action = target.dataset.action;
 
@@ -193,8 +232,8 @@ export default class CloseIo_Controller {
 
 	updateMap() {
 		// updates map size & centers position - wait for anim .15s
+		window.dispatchEvent( new Event( 'resize' ) );
 		setTimeout( () => {
-			window.dispatchEvent( new Event( 'resize' ) );
 			window.dispatchEvent( new Event( 'addressSwiped' ) );
 		}, 150 );
 	}
@@ -270,16 +309,20 @@ export default class CloseIo_Controller {
 
 		let
 			modal 					= this.modal,
-			input 					= this.model.currentAddress.input,
-			uri 						= this.model.config.baseApi,
-			totalCounter 		= this.modalElements.totalCounter,
+			model 					= this.model,
 			counter 				= this.modalElements.counter,
-			currentAddress 	= this.model.currentAddress.current,
-			id 							= this.model.currentAddress.id.replace(/['"]+/g, '' ),
-			next 						= this.modal.querySelector( '.address__next' ),
-			none 						= 'None found for this lead.',
+			totalCounter 		= this.modalElements.totalCounter,
 			
-			actions = {
+			uri 						= model.config.baseApi,
+			
+			currentAddress 	= model.currentAddress.current,
+			id 							= model.currentAddress.id.replace(/['"]+/g, '' ),
+			input 					= model.currentAddress.input,
+			
+			next 						= this.modal.querySelector( '.address__next' ),
+			none 						= 'None found for this lead.';
+			
+			let actions = {
 				// DISMISS MODAL
 				'dismiss-modal': () => {
 					console.log( 'Modal should have closed...' );
@@ -291,7 +334,7 @@ export default class CloseIo_Controller {
 						return;
 
 					this.state = 'adding';
-					this.model.currentAddress.input.classList.remove( 'invalid' );
+					input.classList.remove( 'invalid' );
 
 					// quick debug
 					toggle ? console.log( 'Adding new...' ) : console.log( 'Cancelled Add New...' );
@@ -335,7 +378,12 @@ export default class CloseIo_Controller {
 							input.focus(); 
 						}, 150 );
 
+
+					// CANCEL ADD NEW
 					} else {
+
+						modal.dispatchEvent( new CustomEvent( 'canceledAddNew' ) );
+
 						modal.classList.remove( 'not-empty', 'map--fetched' );
 						delete next.dataset.action;
 						
