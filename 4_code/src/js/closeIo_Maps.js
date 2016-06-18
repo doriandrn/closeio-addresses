@@ -183,13 +183,17 @@ export default class CloseIo_Maps {
 
 		modal.addEventListener( 'cancelAddNew' , ( e ) => {
 			this.clearMarkers();
+			let l = markers.length;
+			markers[ l-1 ].setMap( null );
 			markers.splice( -1 ); // cut the last item
 			this.setMapOnAll();
 		});
 
 		modal.addEventListener( 'addressRemoved', ( e ) => {
 			this.clearMarkers();
-			markers.splice( e.detail.index, 1 );
+			let i = e.detail.index;
+			markers[ i ].setMap( null );
+			markers.splice( i, 1 );
 			this.setMapOnAll();
 		});
 
