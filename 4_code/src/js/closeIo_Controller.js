@@ -96,6 +96,7 @@ export default class CloseIo_Controller {
 				this.model.config.slider.direction = 'horizontal';
     		this.model.config.slider.nextButton = '.address__next';
     		this.model.config.slider.prevButton = '.address__prev';
+    		this.model.config.slider.setWrapperSize = true;
 				this.model.config.slider.onInit = ( swiper ) => {
 					if ( ! this.model.currentAddress.current ) {
 						console.error( 'Error when initing slider' );
@@ -204,7 +205,7 @@ export default class CloseIo_Controller {
 				return;
 			}
 
-			this.modal.classList.remove( 'map--full' );
+			this.modal.classList.remove( 'map--full', 'list--view' );
 			this.modal.classList.add( 'map' );
 
 			this.state = 'adding';
@@ -257,12 +258,14 @@ export default class CloseIo_Controller {
 		});
 
 		binder.addEventListener( 'click', ( e ) => {
-			let target = e.target;
+			let target = e.target,
+					action;
 
 			if ( ! target )
 				return;
 			   
-			let action = target.dataset.action;
+			if ( target.dataset && target.dataset.action )
+				action = target.dataset.action;
 
 			if ( target.tagName !== 'BUTTON' && action === undefined )
 				return;
@@ -416,7 +419,7 @@ export default class CloseIo_Controller {
 						if ( ! modal.classList.contains( 'not-empty' ) )
 							modal.classList.add( 'not-empty' );
 						
-						modal.classList.remove( 'map', 'map--full' );
+						modal.classList.remove( 'map', 'map--full', 'list--view' );
 
 						if ( tc === 1 )
 							modal.classList.add( 'modal__counter' );
@@ -530,6 +533,8 @@ export default class CloseIo_Controller {
 
 					modal.classList.toggle( 'map--full', ! toggle );
 					modal.classList.toggle( 'map', toggle );
+					modal.classList.remove( 'list--view' );
+
 					this.updateFormData( this.state );
 					setTimeout( () => {
 						this.updateMap();

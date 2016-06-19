@@ -5,9 +5,10 @@
 	line-height: 24px;
 	letter-spacing: .3px;
 	font-style: normal;
-	transition: all .15s ease-in-out;
+	transition: all .15s ease-in-out, opacity .1s ease-out;
 	display: inline-block;
 	vertical-align: middle;
+	opacity: 0;
 	max-width: calc( 100% - 80px );
 	@include font-smoothing( false );
 
@@ -17,7 +18,14 @@
 
 	&es {
 		display: block;
-		
+	}
+
+	&__slide {
+		&.swiper-slide-active {
+			.address {
+				opacity: 1;
+			}
+		}
 	}
 
 	&.none {
@@ -94,6 +102,15 @@
 		letter-spacing: 2px;
 		color: rgba( black, .5 );
 		display: none;
+
+		.counter,
+		.total-counter {
+			letter-spacing: 0;
+		}
+
+		.counter {
+			margin-right: 4px;
+		}
 	}
 
 	&__actions {

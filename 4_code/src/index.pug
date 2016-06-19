@@ -4,14 +4,17 @@ block addressmodal
 	.modal.modal__address(class=(adr.length ? 'not-empty map--full' : '' ) + ' ' + ( adr.length > 1 ? 'modal__counter' : '' ) )
 		aside.modal__aside
 			#addresses__list
-				input.search(type="text" placeholder="Search..." name="search")
-				button.sort.button.button__small(data-sort="tag") Sort
+				.list__search
+					input.search(type="text" placeholder="Search..." name="search")
+				.list__actions
+					button.sort.button.button__small(data-sort="list__address") A-Z
+					button.sort.button.button__small(data-sort="tag") Tag
 				ul.list
 					if adr.length
 						each address in adr
 							li
 								h4.list__address=address.address
-								span.list__tag.tag(data-tag=address.tag)=address.tag
+								span.list__tag.tag.color(data-tag=address.tag)=address.tag
 
 		main.modal__main
 			.modal__header

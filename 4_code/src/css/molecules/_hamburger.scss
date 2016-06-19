@@ -1,4 +1,5 @@
 $hamburgerColor: #c8c7c5;
+$hamburgerHover: #555555;
 
 .modal {
   &.list--view {
@@ -36,7 +37,7 @@ $hamburgerColor: #c8c7c5;
   }
 }
 
-// mobile menu toggle
+
 .nav-toggle {
   border: none;
   background: none;
@@ -46,6 +47,24 @@ $hamburgerColor: #c8c7c5;
   &:focus, 
   &:active {
     outline: none;
+  }
+
+  &:hover {
+    .dots {
+      background: $hamburgerHover;
+
+      &:before,
+      &:after {
+        background: $hamburgerHover;
+      }
+
+    }
+
+    svg {
+      path {
+        stroke: $hamburgerHover;
+      }
+    }
   }
 
   // svg
@@ -91,7 +110,7 @@ $hamburgerColor: #c8c7c5;
 
       path {
         stroke: $hamburgerColor;
-        stroke-width: 100;
+        stroke-width: 70;
         &.x {
           transition: .25s 0s ease-in-out;
           transform-origin: right center;

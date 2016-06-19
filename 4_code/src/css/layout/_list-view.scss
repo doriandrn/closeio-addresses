@@ -7,7 +7,7 @@ $asideWidth: 280px;
 		}
 
 		&__main {
-			margin-left: $asideWidth;
+			transform: translateX( $asideWidth );
 		}
 	}
 }

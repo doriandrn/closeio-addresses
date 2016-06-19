@@ -32,6 +32,10 @@
 @mixin tag-color( $color ) {
 	color: $color;
 	background-color: rgba( $color, .05 );
+
+  &.color {
+    background-color: $color;
+  }
 }
 
 @mixin font-smoothing( $value: on ) {
