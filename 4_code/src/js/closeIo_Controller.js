@@ -155,6 +155,9 @@ export default class CloseIo_Controller {
 		init.slider( me );
 		this.slider = new Swiper( '.address__container', this.model.config.slider );
 
+		// List
+		this.list();
+
 		// The counter
 		init.counter();
 
@@ -163,6 +166,16 @@ export default class CloseIo_Controller {
 		
 		// Click actions & events
 		this.events( modal );
+	}
+
+	list() {
+		if ( ! this.model.config.list )
+			return;
+
+		let addressList = new List( 'addresses__list', {
+			valueNames: [ 'list__address', 'tag' ],
+			searchColumns: [ 'list__address' ]
+		});
 	}
 
 	events( binder ) {
@@ -244,8 +257,12 @@ export default class CloseIo_Controller {
 		});
 
 		binder.addEventListener( 'click', ( e ) => {
-			let target = e.target,
-			    action = target.dataset.action;
+			let target = e.target;
+
+			if ( ! target )
+				return;
+			   
+			let action = target.dataset.action;
 
 			if ( target.tagName !== 'BUTTON' && action === undefined )
 				return;
@@ -352,6 +369,22 @@ export default class CloseIo_Controller {
 				// DISMISS MODAL
 				'dismiss-modal': () => {
 					console.log( 'Modal should have closed...' );
+				},
+
+				// CENTER TO ADDRESS
+				'center-to': ( target ) => {
+					console.log( 'centering' );
+					console.log( target );
+				},	
+
+				// TOGGLE ASIDE
+				'toggle-aside': () => {
+					modal.classList.toggle( 'list--view' );
+
+					setTimeout( () => {
+						this.slider.update( true );
+						this.updateMap();
+					}, 400 );
 				},
 
 				// ADD NEW
@@ -645,7 +678,7 @@ export default class CloseIo_Controller {
 	
 		actionName = actionName.replace( 'cancel-', '' );
 		
-		if ( actionName == 'switch--tag' )
+		if ( actionName == 'switch--tag' || actionName == 'center-to' )
 			toggle = event.target;
 
 		if ( typeof actions[ actionName ] === 'function' )

@@ -287,7 +287,7 @@ export default class CloseIo_Maps {
 
 	geolocate() {
 		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(function(position) {
+			navigator.geolocation.getCurrentPosition( ( position ) => {
 				var geolocation = {
 					lat: position.coords.latitude,
 					lng: position.coords.longitude

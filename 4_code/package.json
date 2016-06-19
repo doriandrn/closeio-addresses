@@ -66,6 +66,7 @@
     "koa-webpack-dev-middleware": "^1.2.1",
     "koa-webpack-dev-server": "^0.3.0",
     "koa-webpack-hot-middleware": "^1.0.3",
+    "list.js": "^1.2.0",
     "lodash": "^4.13.1",
     "mongodb": "^2.1.18",
     "node-sass": "^3.4.2",

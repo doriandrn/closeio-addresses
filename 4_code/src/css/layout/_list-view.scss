@@ -1,0 +1,13 @@
+$asideWidth: 280px;
+
+.modal.list--view {
+	.modal {
+		&__aside {
+			left: 0;
+		}
+
+		&__main {
+			margin-left: $asideWidth;
+		}
+	}
+}
