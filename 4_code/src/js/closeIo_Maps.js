@@ -192,6 +192,10 @@ export default class CloseIo_Maps {
 
 		modal.addEventListener( 'cancelAddNew' , ( e ) => {
 			let l = markers.length;
+			
+			if ( ! l )
+				return;
+
 			markers[ l-1 ].setMap( null );
 			markers.splice( l-1 ); 
 		});

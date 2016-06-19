@@ -1,4 +1,5 @@
 export default class CloseIo_Controller {
+
 	constructor( model, ev ) {
 		this.model = model;
 		this.e = ev;
@@ -44,15 +45,14 @@ export default class CloseIo_Controller {
 		
 		else { // this is for safari
 			let inputs = this.form.querySelectorAll( 'input' ),
-					select = this.form.querySelector( 'select' )
+					select = this.form.querySelector( 'select' ),
+					options = select.querySelectorAll( 'option' );
 			
 			_.each( inputs, ( input ) => {
 					if ( input.type !== "submit" )
 						fd[ input.name ] = input.value;
 			});
 			
-			let options = select.querySelectorAll( 'option' );
-			console.log( options );
 
 			_.each( options, ( option ) => {
 				if ( option.attributes.selected )
@@ -362,8 +362,7 @@ export default class CloseIo_Controller {
 					this.state = 'adding';
 					input.classList.remove( 'invalid' );
 
-					// quick debug
-					toggle ? console.log( 'Adding new...' ) : console.log( 'Cancelled Add New...' );
+					// Total counter nr
 					let tc = parseInt( totalCounter.textContent );
 
 					totalCounter.textContent = toggle ? tc + 1 : tc - 1;

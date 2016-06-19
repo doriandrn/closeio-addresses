@@ -28,6 +28,10 @@
 			}
 
 			.address {
+				&es {
+					margin-bottom: 30px;
+				}
+
 				&__actions {
 					@include vShow;
 				}

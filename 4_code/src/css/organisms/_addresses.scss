@@ -3,16 +3,17 @@
 	border-radius: 20px;
 	font-size: 13px;
 	line-height: 24px;
-	letter-spacing: .1px;
+	letter-spacing: .3px;
 	font-style: normal;
 	transition: all .15s ease-in-out;
 	display: inline-block;
 	vertical-align: middle;
 	max-width: calc( 100% - 80px );
+	@include font-smoothing( false );
 
 	&es {
 		display: block;
-		margin-bottom: 30px;
+		
 	}
 
 	&.none {
@@ -29,7 +30,7 @@
 		position: relative;
 		width: 100%;
 		margin: 0 auto;
-		overflow: hidden;
+		// overflow: hidden;
 		white-space: nowrap;
 		user-select: none;
 		cursor: default;
@@ -84,8 +85,9 @@
 
 	&__counter {
 		vertical-align: middle;
-		font-size: 16px;
+		font-size: 15px;
 		margin-left: 20px;
+		letter-spacing: 2px;
 		color: rgba( black, .5 );
 		display: none;
 	}

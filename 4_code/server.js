@@ -1,22 +1,28 @@
+const config        = require('./src/js/config')
+
 const koa           = require('koa')
 const koaBody       = require('koa-bodyparser')
 const Pug           = require('koa-pug')
-const app           = koa()
 const router        = require('koa-router')()
 const mongo         = require('koa-mongo')
 const compose       = require('koa-compose')
 const common        = require('koa-common')
+
 const webpack       = require('webpack')
-const config        = require('./build/webpack.dev.conf')
-const compiler      = webpack(config);
+const webpackConfig = require('./build/webpack.dev.conf')
+const compiler      = webpack(webpackConfig);
+
+const app           = koa()
+
 const historyApiFallback = require('koa-history-api-fallback');
-const webpackMiddleware = require("koa-webpack-dev-middleware")
+const webpackMiddleware = require('koa-webpack-dev-middleware')
 
 var addresses,
-    ObjectID = require('mongodb').ObjectID,
-    apiBase = '/api/lead/id/addresses';
+    ObjectID  = require('mongodb').ObjectID,
+    apiBase   = config.baseApi,
+    ajax      = config.ajax;
 
-config.historyApiFallback = true
+webpackConfig.historyApiFallback = true
 
 const pug = new Pug({
   viewPath: './src',
@@ -51,7 +57,7 @@ router
 
 function *getAddresses(next) {
   addresses = yield this.mongo.db('closeio_addresses').collection('addresses').find().toArray();
-  this.render('index', { path: config.output.path, addresses: addresses }, true)
+  this.render('index', { path: webpackConfig.output.path, addresses: addresses }, true)
 }
 
 function *getAddress() {
@@ -59,18 +65,15 @@ function *getAddress() {
   this.status = 200;
 }
 
-function *addAddress() {
-  console.log(  this.request.type );
-  console.log(  this.request.body );
-  
+function *addAddress() {  
   if ( this.request.body.length < 1 )
-    console.error( 'Could not add address! Empty object supplied.')
+    return;
 
   this.body = yield this.mongo.db('closeio_addresses').collection('addresses').save( this.request.body );
-  this.status = 200
+  // this.status = 200
   
-  // if ! ajax
-  // this.redirect('/')
+  if ( ! ajax )
+    this.redirect('/')
 }
 
 function *updateAddress() {
@@ -85,8 +88,8 @@ function *updateAddress() {
   this.body = this.request.body.del ? yield this.mongo.db('closeio_addresses').collection('addresses').remove({"_id": _id }, true ) : yield this.mongo.db('closeio_addresses').collection('addresses').update({"_id": _id }, this.request.body, { upsert: true });
   // this.status = 200
  
-  // if ! ajax
-  // this.redirect('/')
+  if ( ! ajax )
+    this.redirect('/')
 }
 
 app

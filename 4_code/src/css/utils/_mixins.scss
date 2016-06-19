@@ -31,7 +31,18 @@
 
 @mixin tag-color( $color ) {
 	color: $color;
-	background-color: rgba( $color, .1 );
+	background-color: rgba( $color, .05 );
+}
+
+@mixin font-smoothing( $value: on ) {
+  @if $value == on {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  @else {
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+  }
 }
 
 // Media Queries

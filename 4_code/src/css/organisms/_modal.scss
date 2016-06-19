@@ -37,8 +37,9 @@
 	&__header {
 		display: block;
 		position: static;
-		height: 200px;
+		height: 140px;
 		user-select: none;
+		@include font-smoothing;
 	}
 
 	&__content {
@@ -47,6 +48,7 @@
 		left: 50%;
 		transform: translate( -50%, -50% );
 		transition: left .15s ease-in-out;
+		@include font-smoothing;
 	}
 
 	&__title {
