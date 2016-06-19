@@ -47,7 +47,6 @@ export default class CloseIo_Maps {
 	  	
     	mapObj.setZoom( this.config.map.maxZoom );
     	mapObj.panTo( marker.getPosition() );
-    	console.log( 'index', index );
 
     	this.modal.dispatchEvent( new CustomEvent( 'markerClick', { detail: { index: index } } ) );
   	});
@@ -113,11 +112,9 @@ export default class CloseIo_Maps {
 						mapObj.setCenter( results[0].geometry.location );
 					}
 
-					// address.dataset.lng = results[0].geometry.location.lng();
-					// address.dataset.lat = results[0].geometry.location.lat();
-
-					// this.addMarker( results[0].geometry.location, address.textContent );
-					
+					address.dataset.lng = results[0].geometry.location.lng();
+					address.dataset.lat = results[0].geometry.location.lat();
+					this.addMarker( results[0].geometry.location, address.textContent );
 
 				} else {
 					console.info( "Geocoder - No results found." );
@@ -157,10 +154,6 @@ export default class CloseIo_Maps {
 
 
 				bounds.extend( marker.getPosition() );
-
-				// google.maps.event.addListener( marker, 'click', () => {
-					// infowindow.open( mapObj, marker );
-				// });
 			}
 		});
 
@@ -176,7 +169,7 @@ export default class CloseIo_Maps {
 		mapObj.setZoom( opts.zoom ); 
 
 		mapObj.addListener( 'click', ( e ) => {
-    	if ( this.modal.classList.contains( 'map--fetched' ) )
+    	if ( this.modal.classList.contains( 'map' ) )
     		return;
 
     	this.addMarker( e.latLng );
@@ -205,11 +198,8 @@ export default class CloseIo_Maps {
 
 		modal.addEventListener( 'addressRemoved', ( e ) => {
 			let i = e.detail.index + 1,
-					l = markers.length;
-
-
-			let index = e.detail.lastslide ? l-(l-1)-1 : l-i;
-			console.log( e.detail, index );
+					l = markers.length,
+					index = e.detail.lastslide ? l-(l-1)-1 : l-i;
 
 			markers[ index ].setMap( null );
 			markers.splice( index, 1 );
@@ -270,8 +260,6 @@ export default class CloseIo_Maps {
 		}
 
 		if ( place.geometry.viewport ) {
-			
-			console.log( 'treaba e buna' );
 
 			setTimeout( () => {
 				window.dispatchEvent( new Event( 'resize' ) );
@@ -289,30 +277,6 @@ export default class CloseIo_Maps {
 
 			markers.unshift( marker );
 		}
-
-		
-
-		// autocMarker.setIcon(/** @type {google.maps.Icon} */({
-		// 	url: place.icon,
-		// 	size: new google.maps.Size(71, 71),
-		// 	origin: new google.maps.Point(0, 0),
-		// 	anchor: new google.maps.Point(17, 34),
-		// 	scaledSize: new google.maps.Size(35, 35)
-		// }));
-		// autocMarker.setPosition( place.geometry.location );
-		// autocMarker.setVisible( true );
-
-		// let add = '', addressmap;
-		// if ( place.address_components ) {
-		// 	add = [
-		// 		(place.address_components[0] && place.address_components[0].short_name || ''),
-		// 		(place.address_components[1] && place.address_components[1].short_name || ''),
-		// 		(place.address_components[2] && place.address_components[2].short_name || '')
-		// 	].join(' ');
-		// }
-
-		// addressmap.infoWindow.setContent('<div><strong>' + place.name + '</strong><br>' + add);
-		// addressmap.infoWindow.open( mapObj, marker );
 		
 		document.querySelector( '.modal__address' ).dispatchEvent( new Event( 'addressInserted' ) );
 	}
@@ -328,7 +292,6 @@ export default class CloseIo_Maps {
 					center: geolocation,
 					radius: position.coords.accuracy
 				});
-				// mapObj.setBounds(circle.getBounds());
 			});
 		}
 	}

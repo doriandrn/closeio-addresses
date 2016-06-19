@@ -1,7 +1,7 @@
 extends principal
 block addressmodal
 	- var thisAdr = adr[activeAdrIndex-1] 
-	.modal.modal__address(class=(adr.length ? 'not-empty map--fetched--full' : '' ) + ' ' + ( adr.length > 1 ? 'modal__counter' : '' ) )
+	.modal.modal__address(class=(adr.length ? 'not-empty map--full' : '' ) + ' ' + ( adr.length > 1 ? 'modal__counter' : '' ) )
 		.modal__header
 			button.button.modal__close.close(data-action="dismiss-modal") Close
 			.modal__title

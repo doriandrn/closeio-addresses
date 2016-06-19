@@ -94,6 +94,9 @@
 		@include vHide;
 
 		> .button {
+			display: inline-block;
+			vertical-align: top;
+
 			i {
 				display: block;
 				position: relative;
@@ -118,14 +121,15 @@
 
 				// button Tooltips
 				&:before {
-					content: attr(data-content);
+					content: attr( data-content );
 					position: absolute;
 					bottom: 100%;
 					width: auto;
 					background: white;
 					font-size: 11px;
-					border: 1px solid rgba( black, .05 );
-					box-shadow: 0px 5px 1px -1px rgba( black, .05 );
+					// border: 1px solid rgba( black, .05 );
+					// box-shadow: 0px 5px 1px -1px rgba( black, .05 );
+					box-shadow: 0px 5px 20px 5px rgba( black, .05 );
 					color: rgba( black, .75 );
 					padding: 5px 10px;
 					text-transform: capitalize;
@@ -140,12 +144,31 @@
 				}
 
 				&:after {
-
+					content: "";
+			    position: absolute;
+			    width: 0;
+			    height: 0;
+			    left: calc( 50% - 6px );
+			    transform: trnslateX( -50% );
+			    bottom: 100%;
+					transition: all .1s ease-in-out;
+			    box-sizing: border-box;
+			    border: 4px solid black;
+			    box-shadow: -1px 2px 5px -1px rgba( black, .05 );
+			    border-color: transparent transparent white white;
+			    opacity: 0;
+					visibility: hidden;
+			    transform-origin: 0 0;
+			    transform: rotate(-45deg);
 				}
 
 				&:hover {
 					&:before {
-						bottom: calc( 100% + 5px );
+						bottom: calc( 100% + 5px );						
+					}
+
+					&:before,
+					&:after {
 						opacity: 1;
 						visibility: visible;
 					}

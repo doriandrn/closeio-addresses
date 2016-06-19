@@ -1,6 +1,4 @@
 export default class CloseIo_Controller {
-	// console.log( { action: actionName, model: model, modalElements: modalElements, slider: slider } );
-
 	constructor( model, ev ) {
 		this.model = model;
 		this.e = ev;
@@ -39,8 +37,6 @@ export default class CloseIo_Controller {
 	get formData() {
 		let fd = {},
 				formdata = new FormData( this.form );
-			
-		console.log( formdata );
 
 		if ( formdata.entries )
 			for ( let [ key, value ] of formdata )
@@ -176,9 +172,8 @@ export default class CloseIo_Controller {
 
 		binder.addEventListener( 'addressInserted', ( e ) => {
 			console.log( 'Got address!' );
-			modal.classList.add( 'map--fetched' );
+			modal.classList.add( 'map' );
 			input.classList.remove( 'invalid' );
-
 		});
 
 
@@ -195,11 +190,9 @@ export default class CloseIo_Controller {
 				console.info( 'Geocode failed' );
 				return;
 			}
-			
-			console.log( results );
 
-			this.modal.classList.remove( 'map--fetched--full' );
-			this.modal.classList.add( 'map--fetched' );
+			this.modal.classList.remove( 'map--full' );
+			this.modal.classList.add( 'map' );
 
 			this.state = 'adding';
 			input.classList.remove( 'invalid' );
@@ -266,16 +259,13 @@ export default class CloseIo_Controller {
 		});
 	}
 
+	// updates map size & centers position - wait for anim .15s
 	updateMap() {
-		// updates map size & centers position - wait for anim .15s
 		window.dispatchEvent( new Event( 'resize' ) );
 		this.modal.dispatchEvent( new Event( 'addressSwiped' ) );
-
-		// setTimeout( () => {
-		// 	this.modal.dispatchEvent( new Event( 'addressSwiped' ) );
-		// }, 150 );
 	}
 
+	
 	// update actionID for remove form
 	updateRemoveFormActionId( id ) {
 		if ( typeof id === undefined || ! id )
@@ -394,7 +384,7 @@ export default class CloseIo_Controller {
 						if ( ! modal.classList.contains( 'not-empty' ) )
 							modal.classList.add( 'not-empty' );
 						
-						modal.classList.remove( 'map--fetched', 'map--fetched--full' );
+						modal.classList.remove( 'map', 'map--full' );
 
 						if ( tc === 1 )
 							modal.classList.add( 'modal__counter' );
@@ -417,15 +407,16 @@ export default class CloseIo_Controller {
 					// CANCEL ADD NEW
 					} else {
 
+						event.preventDefault();
 						modal.dispatchEvent( new CustomEvent( 'cancelAddNew' ) );
 
-						modal.classList.remove( 'not-empty', 'map--fetched' );
+						modal.classList.remove( 'not-empty', 'map' );
 						delete next.dataset.action;
 						
 						if ( tc > 1 ) {
 							this.slider.removeSlide(0);
 							this.slider.slideTo(0); 
-							modal.classList.add( 'not-empty', 'map--fetched--full' );
+							modal.classList.add( 'not-empty', 'map--full' );
 
 						} else {
 							currentAddress.classList.add( 'none' );
@@ -439,8 +430,6 @@ export default class CloseIo_Controller {
 							this.updateMap(); 
 						}, 150 );
 					}
-
-					// this.updateFormData( this.state );
 				},
 
 				'remove': () => {
@@ -507,8 +496,8 @@ export default class CloseIo_Controller {
 				'edit': ( toggle = true ) => {
 					this.state = 'editing';
 
-					modal.classList.toggle( 'map--fetched--full', ! toggle );
-					modal.classList.toggle( 'map--fetched', toggle );
+					modal.classList.toggle( 'map--full', ! toggle );
+					modal.classList.toggle( 'map', toggle );
 					this.updateFormData( this.state );
 					setTimeout( () => {
 						this.updateMap();
@@ -539,8 +528,8 @@ export default class CloseIo_Controller {
 							console.log( response );
 							
 							if ( response.ok ) {
-								this.modal.classList.remove('map--fetched');
-								this.modal.classList.add('map--fetched--full');
+								this.modal.classList.remove('map');
+								this.modal.classList.add('map--full');
 
 								_.each( fd, ( value, key ) => {
 									switch( key ) {
@@ -585,11 +574,6 @@ export default class CloseIo_Controller {
 					});
 					
 					target.classList.add('active');
-
-					if ( this.state == "editing" ) {
-						console.log( 'currently editing' );
-						// ToDO: update currentAddress with class of selected tag
-					}
 				},
 
 				// Save for ADD NEW
@@ -618,19 +602,18 @@ export default class CloseIo_Controller {
 					xhttp.onreadystatechange = () => {
 						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
 							let response = JSON.parse( xhttp.responseText );
-							console.log( response );
 							
 							if ( response.ok ) {
 								let _id = ! response.upserted ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
-								console.log( _id );
+								// console.log( _id );
 
 								currentAddress.dataset.id = _id; 
 								currentAddress.classList.remove( 'adding', 'none' );
 
 								this.state = 'editing';
 
-								this.modal.classList.remove('map--fetched');
-								this.modal.classList.add('map--fetched--full');
+								this.modal.classList.remove('map');
+								this.modal.classList.add('map--full');
 
 								this.updateRemoveFormActionId( _id );
 
