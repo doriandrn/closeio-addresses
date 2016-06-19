@@ -260,6 +260,10 @@ export default class CloseIo_Controller {
 			if ( action )
 				this.actions.apply( this, [ action, e ] );
 		});
+
+		binder.addEventListener( 'markerClick', ( e ) => {
+			this.slider.slideTo( e.detail.index );
+		});
 	}
 
 	updateMap() {
@@ -454,9 +458,9 @@ export default class CloseIo_Controller {
 					let address = {
 						del: true,
 						id: id
-					}
-
-					let xhttp = new XMLHttpRequest();
+					},
+					lastslide = false,
+					xhttp = new XMLHttpRequest();
 
 					xhttp.onreadystatechange = () => {
 						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
@@ -466,12 +470,12 @@ export default class CloseIo_Controller {
 							}, 150 );
 							
 							let c = parseInt( totalCounter.textContent );
-							console.log( 'c: ' + c );
-
 							totalCounter.textContent = c - 1; 
 							
-							if ( c === parseInt( counter.textContent ) )
+							if ( c === parseInt( counter.textContent ) ) {
+								lastslide = true; // fix for swiper slider, urgh...
 								counter.textContent -= 1;
+							}
 
 							if ( c === 2 )
 								this.modal.classList.remove( 'modal__counter' );
@@ -484,7 +488,7 @@ export default class CloseIo_Controller {
 								]);
 							}
 
-							this.modal.dispatchEvent( new CustomEvent( 'addressRemoved', { detail: { index: this.activeIndex } } ) );
+							this.modal.dispatchEvent( new CustomEvent( 'addressRemoved', { detail: { index: this.activeIndex, lastslide: lastslide } } ) );
 							this.updateRemoveFormActionId();
 
 							setTimeout( () => {

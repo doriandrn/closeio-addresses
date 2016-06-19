@@ -31,17 +31,26 @@ export default class CloseIo_Maps {
 	}
 
 	// Adds a marker to the map and push to the array.
-	addMarker( address, name = '', ret = false, unshift = false ) {
+	addMarker( address, name = '', ret = false ) {
 	  let marker = new google.maps.Marker({
 	    position: address,
 	    label: name,
 	    map: mapObj,
 	  });
 
-	 	if ( unshift )
-	 		markers.unshift( marker );
-	 	else
-	  	markers.push( marker );
+  	markers.push( marker );
+
+	  marker.addListener( 'click', () => {
+	  	let l = markers.length -1,
+	 			i = markers.indexOf( marker ),
+	 			index = l - i;
+	  	
+    	mapObj.setZoom( this.config.map.maxZoom );
+    	mapObj.panTo( marker.getPosition() );
+    	console.log( 'index', index );
+
+    	this.modal.dispatchEvent( new CustomEvent( 'markerClick', { detail: { index: index } } ) );
+  	});
 
 	  if ( ret )
 	  	return marker;
@@ -155,7 +164,7 @@ export default class CloseIo_Maps {
 			}
 		});
 
-		// markers.reverse();
+		markers.reverse();
 
 		if ( current.dataset.lat && current.dataset.lng )
 			mapObj.setCenter( new google.maps.LatLng( { lat: parseFloat( current.dataset.lat ), lng: parseFloat( current.dataset.lng ) } ) );
@@ -167,7 +176,10 @@ export default class CloseIo_Maps {
 		mapObj.setZoom( opts.zoom ); 
 
 		mapObj.addListener( 'click', ( e ) => {
-    	this.addMarker( e.latLng, '', false, true );
+    	if ( this.modal.classList.contains( 'map--fetched' ) )
+    		return;
+
+    	this.addMarker( e.latLng );
     	
     	let lat = e.latLng.lat(),
     			lng = e.latLng.lng();
@@ -186,23 +198,21 @@ export default class CloseIo_Maps {
   	});
 
 		modal.addEventListener( 'cancelAddNew' , ( e ) => {
-			// this.clearMarkers();
-			// let l = markers.length;
+			let l = markers.length;
 			markers[ l-1 ].setMap( null );
-			markers.splice( -1 ); // cut the last item
-			// this.setMapOnAll();
+			markers.splice( l-1 ); 
 		});
 
 		modal.addEventListener( 'addressRemoved', ( e ) => {
-			// this.clearMarkers();
-			let i = e.detail.index,
-					l = markers.length - 1;
+			let i = e.detail.index + 1,
+					l = markers.length;
 
-			console.log( i, markers );
-			markers[ i ].setMap( null );
-			markers.splice( i, 1 );
-			console.log( i, markers );
-			// this.setMapOnAll();
+
+			let index = e.detail.lastslide ? l-(l-1)-1 : l-i;
+			console.log( e.detail, index );
+
+			markers[ index ].setMap( null );
+			markers.splice( index, 1 );
 		});
 
 		modal.addEventListener( 'addressSwiped', () => {
