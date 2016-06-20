@@ -597,10 +597,9 @@ export default class CloseIo_Controller {
 					xhttp.onreadystatechange = () => {
 						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
 							let response = JSON.parse( xhttp.responseText );
-							console.log( response );
 							
 							if ( response.ok ) {
-								this.modal.classList.remove('map');
+								this.modal.classList.remove( 'map' );
 								this.modal.classList.add('map--full');
 
 								_.each( fd, ( value, key ) => {
@@ -614,6 +613,17 @@ export default class CloseIo_Controller {
 											break;
 									}
 								});
+
+								if ( this.list ) {
+									let liToUpdate = modal.querySelector( '#addresses__list ul.list li[data-index="' + this.activeIndex + '"]' );
+
+									if ( liToUpdate ) {
+										liToUpdate.children[0].textContent = fd.address;
+										liToUpdate.children[1].dataset.tag = fd.tag;
+									}
+
+									this.list.reIndex();
+								}
 
 								setTimeout( () => {
 									this.updateMap();
@@ -702,7 +712,7 @@ export default class CloseIo_Controller {
 								});
 
 								if ( this.list ) {
-									
+									console.log( fd );
 
 									_.each( listItems, ( li ) => {
 										let i = parseInt( li.dataset.index );

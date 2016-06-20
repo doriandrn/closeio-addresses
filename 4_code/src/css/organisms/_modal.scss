@@ -103,7 +103,7 @@
 
 			&__address {
 				font-style: normal;
-				padding: 0 0 0 25px;
+				padding: 10px 0 10px 25px;
 				display: block;
 				margin: 0;
 			}
@@ -120,7 +120,7 @@
 			}
 
 			li {
-				padding: 10px 0;
+				display: block;
 				position: relative;
 				cursor: pointer;
 				color: rgba( black, .5 );
