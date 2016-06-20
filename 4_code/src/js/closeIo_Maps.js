@@ -168,6 +168,9 @@ export default class CloseIo_Maps {
 						
 				this.addMarker( position, address.textContent, true );
 			}
+
+			// console.log( this.model.list );
+
 		});
 
 
@@ -226,7 +229,6 @@ export default class CloseIo_Maps {
 					cancel = e.detail.cancel;
 
 			if ( ! cancel && pos ) {
-				console.log( 'yayo' );
 				backupMarker = {
 					lat: markers[ index ].position.lat(),
 					lng: markers[ index ].position.lng()
@@ -300,8 +302,10 @@ export default class CloseIo_Maps {
 				return;
 
 			this.toggleBounce( i );
-			let active = new google.maps.LatLng({ lat: parseFloat( currentAddress.dataset.lat ), lng: parseFloat( currentAddress.dataset.lng ) });
-			mapObj.panTo( active );
+			markers[i].setDraggable( true );
+			modal.dispatchEvent( new CustomEvent( 'dragMarker', { detail: { index: i } } ) );
+			
+			mapObj.panTo( new google.maps.LatLng({ lat: parseFloat( currentAddress.dataset.lat ), lng: parseFloat( currentAddress.dataset.lng ) }) );
 			mapObj.setZoom( opts.zoom ); 
 		});
 

@@ -27,14 +27,18 @@
 		position: absolute 0 auto 0 #{-$asideWidth};
 		width: $asideWidth;
 		background: #fafafa;
-		padding: 20px;
 		text-align: left;
 		font-weight: normal;
 		transition: left .4s $listEffect;
 		overflow: auto;
 
-		@include mq( 540px ) {
-			padding: 40px;
+		header {
+			padding: 20px;
+			box-shadow: 0px 1px 11px rgba( black, .05 );
+			
+			@include mq( 540px ) {
+				padding: 40px;
+			}
 		}
 
 		&__toggle {
@@ -108,11 +112,15 @@
 
 		.list {
 			@include reset-list;
-			margin-top: 40px;
+			padding: 10px 20px;
+
+			@include mq( 540px ) {
+				padding: 30px 40px;
+			}
 
 			&__address {
 				font-style: normal;
-				padding: 10px 0 10px 25px;
+				padding: 10px 10px 10px 25px;
 				display: block;
 				margin: 0;
 			}

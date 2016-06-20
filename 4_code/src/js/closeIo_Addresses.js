@@ -1,7 +1,8 @@
 // Libs for awesomeness
 let _ 			= require( 'lodash' ),
 		swiper 	= require( 'swiper' ),
-		List 		= require( 'list.js' );
+		List 		= require( 'list.js' ),
+		IScroll	= require( 'iscroll' );
 
 // describe
 export default class CloseIo_Addresses {
@@ -46,16 +47,4 @@ export default class CloseIo_Addresses {
 
 		return AFModel;
 	}
-
-	// Modal State - based on classes
-	get modalState() {
-		// let parse
-		return this.modal.classList;
-	}
-
-	set modalState( classesArray ) {
-		this.modal.classList.add( classesArray );
-		console.log( 'modal state changed to:' + classesArray.toString() );
-	}
-
 }

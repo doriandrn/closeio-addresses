@@ -149,6 +149,41 @@ export default class CloseIo_Controller {
 				});
 				
 				tagSelect.style.display = 'none';
+			},
+
+			list: () => {
+				if ( ! this.model.config.list ) {
+					this.list = false;
+					return;
+				}
+
+				this.list = new List( 'addresses__list', {
+					valueNames: [ 'list__address', {
+						attr: 'data-tag',
+						name: 'tag'
+					}, {
+						data: ['index'],
+					}],
+					searchColumns: [ 'list__address', 'tag' ]
+				});
+
+				let testList = this.list.get( 'list__address', 'No address' ),
+						addresses = this.modal.querySelectorAll( '.addresses address' );
+
+				if ( typeof testList[0] === 'object' )
+					this.list.remove( 'index', 0 );
+
+				_.each( addresses, ( address, i ) => {
+					this.list.add( {
+						'list__address': address.textContent,
+						'tag': address.dataset.tag,
+						'index': i
+					});
+				});
+			},
+
+			asideScroll: () => {
+				// let list = new IScroll( 'aside section.list__list' );
 			}
 		}
 
@@ -163,7 +198,10 @@ export default class CloseIo_Controller {
 		init.tags( this.form );
 		
 		// List
-		this.initList();
+		init.list();
+
+		// Aside Scroll
+		init.asideScroll();
 
 		// Click actions & events
 		this.events( modal );
@@ -329,29 +367,6 @@ export default class CloseIo_Controller {
 		this.modal.dispatchEvent( new CustomEvent( 'addressSwiped', { detail: { index: this.activeIndex } } ) );
 	}
 
-	initList() {
-		if ( ! this.model.config.list ) {
-			this.list = false;
-			return;
-		}
-
-		this.list = new List( 'addresses__list', {
-			valueNames: [ 'list__address', {
-				attr: 'data-tag',
-				name: 'tag'
-			}, {
-				data: ['index'],
-			}],
-			searchColumns: [ 'list__address', 'tag' ]
-		});
-
-		let testList = this.list.get( 'list__address', 'No address' );
-
-		if ( typeof testList[0] === 'object' )
-			this.list.remove( 'index', 0 );
-	}
-
-	
 	// update actionID for remove form
 	updateRemoveFormActionId( id ) {
 		if ( typeof id === undefined || ! id )
@@ -646,6 +661,11 @@ export default class CloseIo_Controller {
 					}, 150 );
 
 					if ( ! toggle ) {
+						modal.dispatchEvent( new CustomEvent( 'markerDragged', {
+							detail: {
+								index: this.activeIndex
+							}
+						}));
 						modal.dispatchEvent( new CustomEvent( 'updateMarker', {
 							detail: {
 								index: this.activeIndex,
