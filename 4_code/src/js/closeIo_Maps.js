@@ -48,11 +48,26 @@ export default class CloseIo_Maps {
 	  	let
 	 			i = markers.indexOf( marker );
 
+	 		if ( this.modal.classList.contains( 'map' ) )
+	 			return;
+
     	mapObj.setZoom( this.config.map.maxZoom );
     	mapObj.panTo( marker.getPosition() );
 
+    	this.toggleBounce( i );
     	this.modal.dispatchEvent( new CustomEvent( 'markerClick', { detail: { index: i } } ) );
   	});
+	}
+
+	toggleBounce( index ) {
+	  if ( markers[ index ].getAnimation() !== null ) {
+	    markers[ index ].setAnimation( null );
+	  } else {
+	    markers[ index ].setAnimation( google.maps.Animation.BOUNCE );
+	    setTimeout( () => {
+	    	markers[ index ].setAnimation( null );
+	    }, 500 );
+	  }
 	}
 
 	// Sets the map on all markers in the array.
@@ -232,6 +247,10 @@ export default class CloseIo_Maps {
 
 			backupMarker = markers[i].getPosition();
 
+			markers[i].addListener( 'dragstart', () => {
+				modal.classList.add( 'adding' );
+			});
+
 			markers[i].addListener( 'dragend', () => {
 				let pos = markers[i].getPosition(),
 						lat = pos.lat(),
@@ -273,11 +292,14 @@ export default class CloseIo_Maps {
 			markers.splice( i, 1 );
 		});
 
-		modal.addEventListener( 'addressSwiped', () => {
-			let currentAddress = document.querySelector( '.swiper-slide-active address' );
+		modal.addEventListener( 'addressSwiped', ( e ) => {
+			let currentAddress = document.querySelector( '.swiper-slide-active address' ),
+					i = e.detail.index;
+			
 			if ( ! currentAddress.dataset.lng || ! currentAddress.dataset.lat )
 				return;
 
+			this.toggleBounce( i );
 			let active = new google.maps.LatLng({ lat: parseFloat( currentAddress.dataset.lat ), lng: parseFloat( currentAddress.dataset.lng ) });
 			mapObj.panTo( active );
 			mapObj.setZoom( opts.zoom ); 

@@ -109,7 +109,7 @@ export default class CloseIo_Controller {
 
 					this.updateFormData( this.state );
 					this.updateRemoveFormActionId( );
-					modal.dispatchEvent( new Event( 'addressSwiped' ) );
+					modal.dispatchEvent( new CustomEvent( 'addressSwiped', { detail: { index: swiper.activeIndex } } ) );
 				};
 			},
 
@@ -225,13 +225,9 @@ export default class CloseIo_Controller {
 				}
 			});
 
-			if ( position.lat ) {
+			if ( position.lat && position.lng ) {
 				document.getElementById( 'lat' ).value = position.lat;
-				this.model.currentAddress.current.dataset.lat = position.lat;
-			}
-			if ( position.lng ) {
 				document.getElementById( 'lng' ).value = position.lng;
-				this.model.currentAddress.current.dataset.lng = position.lng;
 			}
 			
 			input.value = results.formatted_address || "";
@@ -252,7 +248,7 @@ export default class CloseIo_Controller {
 			}
 
 			this.modal.classList.remove( 'map--full', 'list--view' );
-			this.modal.classList.add( 'map', 'editing' );
+			this.modal.classList.add( 'map', 'adding', 'editing' );
 
 			this.state = 'adding';
 			input.classList.remove( 'invalid' );
@@ -330,7 +326,7 @@ export default class CloseIo_Controller {
 	// updates map size & centers position - wait for anim .15s
 	updateMap() {
 		window.dispatchEvent( new Event( 'resize' ) );
-		this.modal.dispatchEvent( new Event( 'addressSwiped' ) );
+		this.modal.dispatchEvent( new CustomEvent( 'addressSwiped', { detail: { index: this.activeIndex } } ) );
 	}
 
 	initList() {
@@ -349,7 +345,9 @@ export default class CloseIo_Controller {
 			searchColumns: [ 'list__address', 'tag' ]
 		});
 
-		if ( typeof this.list.get( 'list__address', 'No address' ) === 'object' )
+		let testList = this.list.get( 'list__address', 'No address' );
+
+		if ( typeof testList[0] === 'object' )
 			this.list.remove( 'index', 0 );
 	}
 
@@ -507,7 +505,7 @@ export default class CloseIo_Controller {
 						if ( ! modal.classList.contains( 'not-empty' ) )
 							modal.classList.add( 'not-empty' );
 						
-						modal.classList.add('editing');
+						modal.classList.add( 'adding', 'editing' );
 						modal.classList.remove( 'map', 'map--full', 'list--view' );
 
 						if ( tc === 1 )
@@ -533,18 +531,16 @@ export default class CloseIo_Controller {
 
 						event.preventDefault();
 
-						modal.classList.remove( 'not-empty', 'map', 'editing' );
+						modal.classList.remove( 'not-empty', 'map', 'adding', 'editing' );
 						delete next.dataset.action;
-						
-						console.log( tc );
 
 						if ( tc > 1 ) {
 							this.slider.removeSlide(0);
 							this.slider.slideTo(0); 
 							modal.classList.add( 'not-empty', 'map--full' );
+							modal.dispatchEvent( new CustomEvent( 'cancelAddNew' ) );
 
 							if ( tc == 2 ) {
-								modal.dispatchEvent( new CustomEvent( 'cancelAddNew' ) );
 								modal.classList.remove( 'modal__counter' );
 							}
 
@@ -658,6 +654,7 @@ export default class CloseIo_Controller {
 						}));
 					}
 					else {
+						modal.classList.remove('adding');
 						modal.dispatchEvent( new CustomEvent( 'dragMarker', {
 							detail: {
 								index: this.activeIndex
@@ -689,7 +686,7 @@ export default class CloseIo_Controller {
 							let response = JSON.parse( xhttp.responseText );
 							
 							if ( response.ok ) {
-								this.modal.classList.remove( 'map', 'editing' );
+								this.modal.classList.remove( 'map', 'editing', 'adding' );
 								this.modal.classList.add( 'map--full' );
 
 								_.each( fd, ( value, key ) => {
@@ -704,6 +701,12 @@ export default class CloseIo_Controller {
 									}
 								});
 
+								modal.dispatchEvent( new CustomEvent( 'markerDragged', {
+									detail: {
+										index: this.activeIndex
+									}
+								}));
+
 								if ( this.list ) {
 									let liToUpdate = modal.querySelector( '#addresses__list ul.list li[data-index="' + this.activeIndex + '"]' );
 
@@ -714,12 +717,6 @@ export default class CloseIo_Controller {
 
 									this.list.reIndex();
 								}
-
-								modal.dispatchEvent( new CustomEvent( 'markerDragged', {
-									detail: {
-										index: this.activeIndex
-									}
-								}));
 
 								setTimeout( () => {
 									this.updateMap();
@@ -790,7 +787,7 @@ export default class CloseIo_Controller {
 
 								this.state = 'editing';
 
-								this.modal.classList.remove('map', 'editing');
+								this.modal.classList.remove('map', 'editing', 'adding' );
 								this.modal.classList.add('map--full');
 
 								this.updateRemoveFormActionId( _id );
@@ -806,6 +803,9 @@ export default class CloseIo_Controller {
 											break;
 									}
 								});
+
+								// Prevents markers from being dragged fruther on
+								modal.dispatchEvent( new CustomEvent( 'markerDragged', { detail: { index: 0 } } ) );
 
 								if ( this.list ) {
 									_.each( listItems, ( li ) => {
