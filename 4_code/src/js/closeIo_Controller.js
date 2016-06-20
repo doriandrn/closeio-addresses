@@ -1,3 +1,5 @@
+let Scroll	= require( 'perfect-scrollbar' );
+
 export default class CloseIo_Controller {
 
 	constructor( model, ev ) {
@@ -183,7 +185,11 @@ export default class CloseIo_Controller {
 			},
 
 			asideScroll: () => {
-				// let list = new IScroll( 'aside section.list__list' );
+				let selector = document.querySelector( 'aside section.list__list .list' );
+				if ( ! selector )
+					return;
+
+				// Scroll.initialize( selector );
 			}
 		}
 

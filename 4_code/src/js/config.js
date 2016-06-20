@@ -9,6 +9,10 @@ module.exports = {
     loop: 	false,
     a11y: 	true, // accesibility
 	},
+	iscroll: {
+		mouseWheel: true,
+    scrollbars: true
+	},
 	map: {
 		maxZoom: 8
 	},
