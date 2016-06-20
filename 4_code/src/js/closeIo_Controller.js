@@ -157,7 +157,7 @@ export default class CloseIo_Controller {
 		this.slider = new Swiper( '.address__container', this.model.config.slider );
 
 		// List
-		this.list();
+		this.makeList();
 
 		// The counter
 		init.counter();
@@ -169,12 +169,14 @@ export default class CloseIo_Controller {
 		this.events( modal );
 	}
 
-	list() {
+	makeList() {
 		if ( ! this.model.config.list )
 			return;
 
-		let addressList = new List( 'addresses__list', {
-			valueNames: [ 'list__address', 'tag' ],
+		this.list = new List( 'addresses__list', {
+			valueNames: [ 'list__address', 'tag', {
+				data: ['index']
+			}],
 			searchColumns: [ 'list__address' ]
 		});
 	}
@@ -358,6 +360,7 @@ export default class CloseIo_Controller {
 			model 					= this.model,
 			counter 				= this.modalElements.counter,
 			totalCounter 		= this.modalElements.totalCounter,
+			listItems 			= modal.querySelectorAll('.addresses__list .list > li'),
 			
 			uri 						= model.config.baseApi,
 			
@@ -389,7 +392,7 @@ export default class CloseIo_Controller {
 				},
 
 				'swipe-to': ( target ) => {
-					let index = target.dataset.index;
+					let index = target.parentNode.dataset.index;
 
 					console.log( index );
 
@@ -508,6 +511,19 @@ export default class CloseIo_Controller {
 					xhttp.onreadystatechange = () => {
 						if ( xhttp.readyState == 4 && xhttp.status == 200 ) {
 							this.slider.removeSlide( this.activeIndex );
+
+							if ( this.list ) {
+								this.list.remove( 'index', this.activeIndex );
+
+								_.each( listItems, ( li ) => {
+									let i = parseInt( li.dataset.index );
+									if ( i >= this.activeIndex )
+										li.dataset.index = i-1;
+								});
+								this.list.reIndex();
+								console.log( 'sters', this.activeIndex );
+							}
+
 							setTimeout( () => {
 								this.state = 'editing';
 							}, 150 );
@@ -684,6 +700,23 @@ export default class CloseIo_Controller {
 											break;
 									}
 								});
+
+								if ( this.list ) {
+									
+
+									_.each( listItems, ( li ) => {
+										let i = parseInt( li.dataset.index );
+										li.dataset.index = i+1;
+									});
+
+									this.list.add({
+										list__address: fd.address,
+										tag: fd.tag,
+										index: 0
+									});
+
+									this.list.reIndex();
+								}
 
 								if ( totalCounter === 1 )
 									slider.removeSlide( 1 );

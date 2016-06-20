@@ -14,8 +14,8 @@ block addressmodal
 						- var i = -1;
 						each address in adr
 							- i+=1
-							li
-								h4.list__address(data-index=i data-action='swipe-to')=address.address
+							li(data-index=i)
+								h4.list__address(data-action='swipe-to')=address.address
 								span.list__tag.tag.color(data-tag=address.tag)=address.tag
 
 		main.modal__main
