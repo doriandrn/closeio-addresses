@@ -3,7 +3,7 @@ block addressmodal
 	- var thisAdr = adr[activeAdrIndex-1] 
 	.modal.modal__address(class=(adr.length ? 'not-empty map--full' : '' ) + ' ' + ( adr.length > 1 ? 'modal__counter' : '' ) )
 		aside.modal__aside
-			#addresses__list
+			#addresses__list.addresses__list
 				.list__search
 					input.search(type="text" placeholder="Search..." name="search")
 				.list__actions
@@ -11,9 +11,11 @@ block addressmodal
 					button.sort.button.button__small(data-sort="tag") Tag
 				ul.list
 					if adr.length
+						- var i = -1;
 						each address in adr
+							- i+=1
 							li
-								h4.list__address=address.address
+								h4.list__address(data-index=i data-action='swipe-to')=address.address
 								span.list__tag.tag.color(data-tag=address.tag)=address.tag
 
 		main.modal__main

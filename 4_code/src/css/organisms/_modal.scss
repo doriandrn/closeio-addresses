@@ -59,7 +59,7 @@
 			width: 100%;
 			background: white;
 			margin-bottom: 20px;
-			padding: 5px 15px;
+			padding: 5px 35px 5px 15px;
 			border-radius: 25px;
 		}
 
@@ -78,6 +78,7 @@
 
 	    &:after {
 	    	content: ">";
+	    	display: inline-block;
 	    	position: relative;
 	    	margin-left: 10px;
 	    	transition: transform .15s ease-in-out;

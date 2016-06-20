@@ -18,6 +18,23 @@
 
 	&es {
 		display: block;
+
+		&__list {
+			display: block;
+
+			.list {
+				&__search {
+					display: block;
+					position: relative;
+
+					&:before {
+						@include icon( '\64' );
+						position: absolute 6px 15px auto auto;
+						color: rgba( black, .25 );
+					}
+				}
+			}
+		}
 	}
 
 	&__slide {

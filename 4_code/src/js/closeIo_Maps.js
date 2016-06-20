@@ -218,6 +218,15 @@ export default class CloseIo_Maps {
 			mapObj.panTo( active );
 			mapObj.setZoom( opts.zoom ); 
 		});
+
+		modal.addEventListener( 'panTo', ( e ) => {
+			if ( ! e.detail )
+				return;
+
+			console.log( e.detail );
+
+			mapObj.panTo( new google.maps.LatLng( e.detail ) );
+		});
 	}
 
 	// AutoComplete

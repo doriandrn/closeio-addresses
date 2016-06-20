@@ -376,9 +376,28 @@ export default class CloseIo_Controller {
 
 				// CENTER TO ADDRESS
 				'center-to': ( target ) => {
-					console.log( 'centering' );
-					console.log( target );
-				},	
+					let lat = target.dataset.lat,
+							lng = target.dataset.lng;
+
+					if ( ! lat || ! lng )
+						return;
+
+					modal.dispatchEvent( new CustomEvent( 'panTo', { detail: {
+						lat: parseFloat( lat ),
+						lng: parseFloat( lng )
+					} } ) );
+				},
+
+				'swipe-to': ( target ) => {
+					let index = target.dataset.index;
+
+					console.log( index );
+
+					if ( ! index )
+						return;
+
+					this.slider.slideTo( index );
+				},
 
 				// TOGGLE ASIDE
 				'toggle-aside': () => {
@@ -683,7 +702,7 @@ export default class CloseIo_Controller {
 	
 		actionName = actionName.replace( 'cancel-', '' );
 		
-		if ( actionName == 'switch--tag' || actionName == 'center-to' )
+		if ( actionName == 'switch--tag' || actionName == 'center-to' || actionName == 'swipe-to' )
 			toggle = event.target;
 
 		if ( typeof actions[ actionName ] === 'function' )
