@@ -280,6 +280,8 @@ export default class CloseIo_Controller {
 			setTimeout( () => {
 				this.updateMap();
 			}, 150 );
+
+			this.state = 'editing';
 		});
 
 		binder.addEventListener( 'click', ( e ) => {
