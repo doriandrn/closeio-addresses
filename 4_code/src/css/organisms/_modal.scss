@@ -80,8 +80,16 @@
 	    	content: ">";
 	    	display: inline-block;
 	    	position: relative;
-	    	margin-left: 10px;
-	    	transition: transform .15s ease-in-out;
+	    	opacity: 0;
+	    	transition: transform .15s ease-in-out, opacity .1s ease-in-out;
+	    }
+
+	    &.asc,
+	    &.desc {
+	    	&:after {
+	    		opacity: 1;
+	    		margin-left: 10px;
+	    	}
 	    }
 
 	    &.asc {

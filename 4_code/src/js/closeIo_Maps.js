@@ -133,6 +133,7 @@ export default class CloseIo_Maps {
 				current = modal.querySelector( '.swiper-slide-active address' ),
 				bounds = new google.maps.LatLngBounds(),
 				infowindow = new google.maps.InfoWindow(),
+				backupMarker,
 				i = 0,
 				opts = {
 					zoom: this.config.map.maxZoom,
@@ -200,6 +201,43 @@ export default class CloseIo_Maps {
 			markers.splice( l-1 ); 
 		});
 
+		modal.addEventListener( 'updateMarker', ( e ) => {
+			console.log( e.detail );
+
+			let l 		= markers.length,
+					index = ( l - parseInt( e.detail.index ) ) - 1,
+					pos 	= e.detail.position || {},
+					cancel = e.detail.cancel;
+
+			if ( ! pos )
+				return;
+
+			if ( ! cancel && pos ) {
+				backupMarker = {
+					lat: markers[ index ].position.lat(),
+					lng: markers[ index ].position.lng()
+				}
+				markers[ index ].setPosition( pos );
+			}
+			else {
+				markers[ index ].setPosition( backupMarker );
+			}
+		});
+
+		modal.addEventListener( 'addMarker', ( e ) => {
+			let pos = e.detail.position || {},
+					cancel = e.detail.cancel;
+
+			if ( ! pos )
+				return;
+
+			if ( ! cancel ) {
+				this.addMarker( pos );
+			} else {
+				modal.dispatchEvent( new CustomEvent( 'cancelAddNew' ) );
+			}
+		});
+
 		modal.addEventListener( 'addressRemoved', ( e ) => {
 			let i = e.detail.index + 1,
 					l = markers.length,
@@ -222,8 +260,6 @@ export default class CloseIo_Maps {
 		modal.addEventListener( 'panTo', ( e ) => {
 			if ( ! e.detail )
 				return;
-
-			console.log( e.detail );
 
 			mapObj.panTo( new google.maps.LatLng( e.detail ) );
 		});
@@ -283,15 +319,24 @@ export default class CloseIo_Maps {
 			document.getElementById('lat').value = place.geometry.location.lat();
 			document.getElementById('lng').value = place.geometry.location.lng();
 
-			let marker = new google.maps.Marker({
-				position: place.geometry.location,
-				map: mapObj
-			});
+			document.querySelector( '.modal__address' ).dispatchEvent( new CustomEvent( 'addressInserted', {
+				detail: {
+					lat: place.geometry.location.lat(),
+					lng: place.geometry.location.lng()
+				}
+			}));
 
-			markers.unshift( marker );
+			// let marker = new google.maps.Marker({
+			// 	position: place.geometry.location,
+			// 	map: mapObj
+			// });
+
+			// markers.unshift( marker );
+		} else {
+			console.error( 'Could not get geometry viewport of selected addresss' );
 		}
 		
-		document.querySelector( '.modal__address' ).dispatchEvent( new Event( 'addressInserted' ) );
+
 	}
 
 	geolocate() {

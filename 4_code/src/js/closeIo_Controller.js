@@ -186,8 +186,31 @@ export default class CloseIo_Controller {
 				input = this.model.currentAddress.input,
 				next  = modal.querySelector( '.address__next' );
 
-		binder.addEventListener( 'addressInserted', ( e ) => {
-			console.log( 'Got address!' );
+		
+		binder.addEventListener( 'addressInserted', ( e ) => {	
+			let index = this.activeIndex;
+			
+			if ( this.state == 'editing' ) {	
+				modal.dispatchEvent( new CustomEvent( 'updateMarker', {
+					detail: {
+						index: index,
+						position: e.detail,
+						cancel: false
+					}
+				}));
+			} 
+
+			if ( this.state == 'adding' ) {
+				modal.dispatchEvent( new CustomEvent( 'addMarker', {
+					detail: {
+						position: e.detail,
+						cancel: false
+					}
+				}));
+
+				this.state = 'editing';
+			}
+
 			modal.classList.add( 'map' );
 			input.classList.remove( 'invalid' );
 		});
@@ -521,7 +544,7 @@ export default class CloseIo_Controller {
 										li.dataset.index = i-1;
 								});
 								this.list.reIndex();
-								console.log( 'sters', this.activeIndex );
+								
 							}
 
 							setTimeout( () => {
@@ -574,6 +597,15 @@ export default class CloseIo_Controller {
 					setTimeout( () => {
 						this.updateMap();
 					}, 150 );
+
+					if ( ! toggle ) {
+						modal.dispatchEvent( new CustomEvent( 'updateMarker', {
+							detail: {
+								index: this.activeIndex,
+								cancel: true,
+							}
+						}));
+					}
 				},
 
 				'update': () => {
@@ -712,7 +744,6 @@ export default class CloseIo_Controller {
 								});
 
 								if ( this.list ) {
-									console.log( fd );
 
 									_.each( listItems, ( li ) => {
 										let i = parseInt( li.dataset.index );
@@ -724,6 +755,8 @@ export default class CloseIo_Controller {
 										tag: fd.tag,
 										index: 0
 									});
+
+									console.log( fd.tag );
 
 									this.list.reIndex();
 								}
