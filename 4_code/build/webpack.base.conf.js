@@ -69,7 +69,7 @@ module.exports = {
         magic({atRoot: true}),
         pxtorem({replace: false}),
         magician,
-        postcssFontGrabber,
+        postcssFontGrabber({ dirPath: './src/assets/fonts/' }),
         ap //autoprefixer
       ]
     }

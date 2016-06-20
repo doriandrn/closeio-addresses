@@ -1,7 +1,4 @@
-// Libs for awesomeness
-let _ 			= require( 'lodash' ),
-		swiper 	= require( 'swiper' ),
-		List 		= require( 'list.js' );
+let _ 			= require( 'lodash' );
 
 // describe
 export default class CloseIo_Addresses {

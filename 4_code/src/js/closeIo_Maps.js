@@ -1,8 +1,6 @@
 let mapObj,
 		autocomplete,
-		autocMarker,
 		markers = [],
-		infowindow,
 		componentForm = {
 			street_number: 								'short_name',
 			route: 												'long_name',
@@ -147,7 +145,6 @@ export default class CloseIo_Maps {
 				addresses = modal.querySelectorAll( '.addresses address' ),
 				current = modal.querySelector( '.swiper-slide-active address' ),
 				bounds = new google.maps.LatLngBounds(),
-				infowindow = new google.maps.InfoWindow(),
 				backupMarker,
 				i = 0,
 				opts = {
@@ -168,8 +165,6 @@ export default class CloseIo_Maps {
 						
 				this.addMarker( position, address.textContent, true );
 			}
-
-			// console.log( this.model.list );
 
 		});
 
@@ -207,18 +202,20 @@ export default class CloseIo_Maps {
     	});
   	});
 
-		modal.addEventListener( 'cancelAddNew' , ( e ) => {
-			console.log( 'cancelled' );
+  	modal.addEventListener( 'fitBounds', () => {
+			_.each( markers, ( marker ) => {
+				bounds.extend( marker.getPosition() );
+				mapObj.fitBounds( bounds );
+			});
+  	});
 
+		modal.addEventListener( 'cancelAddNew', ( e ) => {
 			markers[ 0 ].setMap( null );
 			markers.splice( 0, 1 ); 
-
-			console.log( 'after cancel', markers );
 		});
 
 		modal.addEventListener( 'markerDragged', ( e ) => {
 			let i = e.detail.index;
-			console.log( i );
 			markers[ i ].setDraggable( false );
 		});
 
@@ -391,10 +388,6 @@ export default class CloseIo_Maps {
 					lat: position.coords.latitude,
 					lng: position.coords.longitude
 				};
-				var circle = new google.maps.Circle({
-					center: geolocation,
-					radius: position.coords.accuracy
-				});
 			});
 		}
 	}

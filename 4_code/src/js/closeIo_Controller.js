@@ -1,4 +1,6 @@
-let Scroll	= require( 'perfect-scrollbar' );
+// Libs for awesomeness
+let	swiper 	= require( 'swiper' ),
+		List 		= require( 'list.js' );
 
 export default class CloseIo_Controller {
 
@@ -120,8 +122,7 @@ export default class CloseIo_Controller {
 				if ( ! el )
 					return;
 
-				let tagSelect = el.querySelector( 'select.address__tags' ),
-						tags = {};
+				let tagSelect = el.querySelector( 'select.address__tags' );
 
 				if ( ! tagSelect ) {
 					console.error( 'No tags select found.' );
@@ -184,13 +185,6 @@ export default class CloseIo_Controller {
 				});
 			},
 
-			asideScroll: () => {
-				let selector = document.querySelector( 'aside section.list__list .list' );
-				if ( ! selector )
-					return;
-
-				// Scroll.initialize( selector );
-			}
 		}
 
 		// Slider
@@ -205,9 +199,6 @@ export default class CloseIo_Controller {
 		
 		// List
 		init.list();
-
-		// Aside Scroll
-		init.asideScroll();
 
 		// Click actions & events
 		this.events( modal );
@@ -462,6 +453,10 @@ export default class CloseIo_Controller {
 					console.log( 'Modal should have closed...' );
 				},
 
+				'fit-bounds': () => {
+					modal.dispatchEvent( new CustomEvent( 'fitBounds' ) );
+				},
+
 				// CENTER TO ADDRESS
 				'center-to': ( target ) => {
 					let lat = target.dataset.lat,
@@ -680,13 +675,13 @@ export default class CloseIo_Controller {
 						}));
 					}
 					else {
-						modal.classList.remove('adding');
 						modal.dispatchEvent( new CustomEvent( 'dragMarker', {
 							detail: {
 								index: this.activeIndex
 							}
 						}));
 					}
+					modal.classList.remove('adding');
 				},
 
 				'update': () => {
@@ -760,8 +755,6 @@ export default class CloseIo_Controller {
 				'switch--tag': ( target ) => {
 					if ( ! target )
 						return;
-
-					let tagVal = target.value;
 						
 					_.each( target.parentNode.children, ( el ) => {
 						el.classList.remove('active');
@@ -806,7 +799,6 @@ export default class CloseIo_Controller {
 							
 							if ( response.ok ) {
 								let _id = ! response.upserted ? response.electionId.replace(/['"]+/g, '' ) : response.upserted[0]._id.replace(/['"]+/g, '' );
-								// console.log( _id );
 
 								currentAddress.dataset.id = _id; 
 								currentAddress.classList.remove( 'adding', 'none' );

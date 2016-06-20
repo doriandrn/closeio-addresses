@@ -1,7 +1,5 @@
 - adr = locals.addresses ? locals.addresses.reverse() : []
 - activeAdrIndex = 1
-// - console.log(addresses)
-- path = path + '/' || ''
 
 doctype html
 html
@@ -9,13 +7,6 @@ html
     meta(charset="utf-8")
     meta(http-equiv="x-ua-compatible", content="ie=edge")
 
-    // #Asset Prefetching - Fetch and download assets before requested by the user
-    link(rel="dns-prefetch", href="")
-
-    // #Page Prefetching
-    //- link(rel="prefetch" href="index.html")
-
-    // #Typekit
     title CloseIo Addresses Modal
 
     meta(name='description', content='')
@@ -28,5 +19,6 @@ html
     script(src="app.js")
 
     link(href="app.css" rel="stylesheet")
+  
   body
     block addressmodal
