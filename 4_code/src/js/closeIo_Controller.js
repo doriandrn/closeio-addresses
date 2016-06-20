@@ -215,6 +215,38 @@ export default class CloseIo_Controller {
 			input.classList.remove( 'invalid' );
 		});
 
+		binder.addEventListener( 'markerPosUpdated', ( e ) => {
+			let results = e.detail.results,
+					position = {
+						lat: e.detail.lat,
+						lng: e.detail.lng
+					};
+
+			if ( ! results ) {
+				console.info( 'Geocode failed' );
+				return;
+			}
+
+			_.each( results.address_components, ( component ) => {
+				if ( component.types[0] ) {
+					let el = document.getElementById( component.types[0] );
+					if ( el )
+						el.value = component.long_name || component.short_name;
+				}
+			});
+
+			if ( position.lat ) {
+				document.getElementById( 'lat' ).value = position.lat;
+				this.model.currentAddress.current.dataset.lat = position.lat;
+			}
+			if ( position.lng ) {
+				document.getElementById( 'lng' ).value = position.lng;
+				this.model.currentAddress.current.dataset.lng = position.lng;
+			}
+			
+			input.value = results.formatted_address || "";
+		});
+
 
 		binder.addEventListener( 'addNew', ( e ) => {
 			let totalCounter 	= this.modalElements.totalCounter,
@@ -430,6 +462,8 @@ export default class CloseIo_Controller {
 				// TOGGLE ASIDE
 				'toggle-aside': () => {
 					modal.classList.toggle( 'list--view' );
+					modal.classList.remove( 'map' );
+					modal.classList.add( 'map--full' );
 
 					setTimeout( () => {
 						this.slider.update( true );
@@ -608,6 +642,13 @@ export default class CloseIo_Controller {
 							}
 						}));
 					}
+					else {
+						modal.dispatchEvent( new CustomEvent( 'dragMarker', {
+							detail: {
+								index: this.activeIndex
+							}
+						}));
+					}
 				},
 
 				'update': () => {
@@ -658,6 +699,12 @@ export default class CloseIo_Controller {
 
 									this.list.reIndex();
 								}
+
+								modal.dispatchEvent( new CustomEvent( 'markerDragged', {
+									detail: {
+										index: this.activeIndex
+									}
+								}));
 
 								setTimeout( () => {
 									this.updateMap();

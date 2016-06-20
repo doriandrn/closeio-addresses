@@ -31,28 +31,40 @@ export default class CloseIo_Maps {
 	}
 
 	// Adds a marker to the map and push to the array.
-	addMarker( address, name = '', ret = false ) {
+	addMarker( address, name = '', push = false ) {
 	  let marker = new google.maps.Marker({
+	    animation: google.maps.Animation.DROP,
 	    position: address,
 	    label: name,
 	    map: mapObj,
 	  });
 
-  	markers.push( marker );
+	  if ( push )
+	  	markers.push( marker );
+	  else
+  		markers.unshift( marker );
 
 	  marker.addListener( 'click', () => {
-	  	let l = markers.length -1,
-	 			i = markers.indexOf( marker ),
-	 			index = l - i;
-	  	
+	  	let
+	 			i = markers.indexOf( marker );
+
     	mapObj.setZoom( this.config.map.maxZoom );
     	mapObj.panTo( marker.getPosition() );
 
-    	this.modal.dispatchEvent( new CustomEvent( 'markerClick', { detail: { index: index } } ) );
+    	this.modal.dispatchEvent( new CustomEvent( 'markerClick', { detail: { index: i } } ) );
   	});
 
-	  if ( ret )
-	  	return marker;
+
+	  // marker.addListener( 'dragstart', () => {
+	  // 	console.log( 'dragging' );
+	  // });
+
+	  // marker.addListener( 'dragend', () => {
+	  // 	console.log( 'dragged' );
+	  // });
+
+	  // if ( ret )
+	  // 	return marker;
 	}
 
 	// Sets the map on all markers in the array.
@@ -142,7 +154,6 @@ export default class CloseIo_Maps {
 
 
 		mapObj = new google.maps.Map( this.map, opts );
-
 		
 		// add markers or geocode them if no lat lng specified for addresss
 		_.each( addresses, ( address ) => {
@@ -150,15 +161,24 @@ export default class CloseIo_Maps {
 			if ( ! address.dataset.lat || ! address.dataset.lng ) {
 				setTimeout( this.geocodeAddress( address, i ), 250 );
 			} else {
-				let position = new google.maps.LatLng( { lat: parseFloat( address.dataset.lat ), lng: parseFloat( address.dataset.lng ) } ),
-						marker = this.addMarker( position, address.textContent, true );
+				let position = new google.maps.LatLng( { lat: parseFloat( address.dataset.lat ), lng: parseFloat( address.dataset.lng ) } );
+						
+					// marker = this.addMarker( position, address.textContent, true );
+				// setTimeout( () => {
+					this.addMarker( position, address.textContent, true );
+				// }, 500 )
 
 
-				bounds.extend( marker.getPosition() );
+				// bounds.extend( marker.getPosition() );
 			}
 		});
+		// markers.reverse();
+		let cc = 0;
+		_.each( markers, (mark) => {
+			console.log( mark.label, cc );
+			cc += 1;
+		});
 
-		markers.reverse();
 
 		if ( current.dataset.lat && current.dataset.lng )
 			mapObj.setCenter( new google.maps.LatLng( { lat: parseFloat( current.dataset.lat ), lng: parseFloat( current.dataset.lng ) } ) );
@@ -192,25 +212,25 @@ export default class CloseIo_Maps {
   	});
 
 		modal.addEventListener( 'cancelAddNew' , ( e ) => {
-			let l = markers.length;
-			
-			if ( ! l )
-				return;
+			markers[ 0 ].setMap( null );
+			markers.splice( 0 ); 
+		});
 
-			markers[ l-1 ].setMap( null );
-			markers.splice( l-1 ); 
+		modal.addEventListener( 'markerDragged', ( e ) => {
+			let i = e.detail.index;
+			console.log( i );
+			markers[ i ].setDraggable( false );
 		});
 
 		modal.addEventListener( 'updateMarker', ( e ) => {
-			console.log( e.detail );
-
-			let l 		= markers.length,
-					index = ( l - parseInt( e.detail.index ) ) - 1,
+			let
+					index = e.detail.index,
 					pos 	= e.detail.position || {},
 					cancel = e.detail.cancel;
 
-			if ( ! pos )
+			if ( ! pos ) {
 				return;
+			}
 
 			if ( ! cancel && pos ) {
 				backupMarker = {
@@ -222,6 +242,34 @@ export default class CloseIo_Maps {
 			else {
 				markers[ index ].setPosition( backupMarker );
 			}
+		});
+
+		modal.addEventListener( 'dragMarker', ( e ) => {
+			let i = e.detail.index;
+
+			markers[i].setDraggable( true );
+			
+			markers[i].addListener( 'dragstart', () => {
+				console.log( 'dragging' );
+			});
+			markers[i].addListener( 'dragend', () => {
+				let pos = markers[i].getPosition(),
+						lat = pos.lat(),
+						lng = pos.lng();
+
+				this.codeLatLng( lat, lng, ( res ) => {
+	    		let	results = res ? res : 'Address not geocoded.' ;
+
+			    modal.dispatchEvent( new CustomEvent( 'markerPosUpdated', {
+			    	detail: {
+				    	results: results,
+				    	lat: lat,
+				    	lng: lng
+				    }
+			    }));
+	    	});
+			});
+
 		});
 
 		modal.addEventListener( 'addMarker', ( e ) => {
@@ -239,12 +287,10 @@ export default class CloseIo_Maps {
 		});
 
 		modal.addEventListener( 'addressRemoved', ( e ) => {
-			let i = e.detail.index + 1,
-					l = markers.length,
-					index = e.detail.lastslide ? l-(l-1)-1 : l-i;
+			let i = e.detail.index;
 
-			markers[ index ].setMap( null );
-			markers.splice( index, 1 );
+			markers[ i ].setMap( null );
+			markers.splice( i, 1 );
 		});
 
 		modal.addEventListener( 'addressSwiped', () => {
@@ -326,12 +372,6 @@ export default class CloseIo_Maps {
 				}
 			}));
 
-			// let marker = new google.maps.Marker({
-			// 	position: place.geometry.location,
-			// 	map: mapObj
-			// });
-
-			// markers.unshift( marker );
 		} else {
 			console.error( 'Could not get geometry viewport of selected addresss' );
 		}
