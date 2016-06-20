@@ -18,6 +18,10 @@ block addressmodal
 							li(data-index=i)
 								h4.list__address(data-action='swipe-to')=address.address
 								span.list__tag.tag.color(data-tag=address.tag)=address.tag
+					else
+						li(data-index=0)
+							h4.list__address(data-action='swipe-to') No addresss
+							span.list__tag.tag.color(data-tag='other') Other
 
 		main.modal__main
 			.modal__header

@@ -249,7 +249,7 @@ export default class CloseIo_Controller {
 			}
 
 			this.modal.classList.remove( 'map--full', 'list--view' );
-			this.modal.classList.add( 'map' );
+			this.modal.classList.add( 'map', 'editing' );
 
 			this.state = 'adding';
 			input.classList.remove( 'invalid' );
@@ -328,6 +328,20 @@ export default class CloseIo_Controller {
 	updateMap() {
 		window.dispatchEvent( new Event( 'resize' ) );
 		this.modal.dispatchEvent( new Event( 'addressSwiped' ) );
+	}
+
+	initList() {
+		if ( ! this.model.config.list ) {
+			this.list = false;
+			return;
+		}
+
+		this.list = new List( 'addresses__list', {
+			valueNames: [ 'list__address', 'tag', {
+				data: ['index']
+			}],
+			searchColumns: [ 'list__address' ]
+		});										
 	}
 
 	
@@ -484,6 +498,7 @@ export default class CloseIo_Controller {
 						if ( ! modal.classList.contains( 'not-empty' ) )
 							modal.classList.add( 'not-empty' );
 						
+						modal.classList.add('editing');
 						modal.classList.remove( 'map', 'map--full', 'list--view' );
 
 						if ( tc === 1 )
@@ -508,15 +523,21 @@ export default class CloseIo_Controller {
 					} else {
 
 						event.preventDefault();
-						// modal.dispatchEvent( new CustomEvent( 'cancelAddNew' ) );
 
-						modal.classList.remove( 'not-empty', 'map' );
+						modal.classList.remove( 'not-empty', 'map', 'editing' );
 						delete next.dataset.action;
 						
+						console.log( tc );
+
 						if ( tc > 1 ) {
 							this.slider.removeSlide(0);
 							this.slider.slideTo(0); 
 							modal.classList.add( 'not-empty', 'map--full' );
+
+							if ( tc == 2 ) {
+								modal.dispatchEvent( new CustomEvent( 'cancelAddNew' ) );
+								modal.classList.remove( 'modal__counter' );
+							}
 
 						} else {
 							currentAddress.classList.add( 'none' );
@@ -759,7 +780,7 @@ export default class CloseIo_Controller {
 
 								this.state = 'editing';
 
-								this.modal.classList.remove('map');
+								this.modal.classList.remove('map', 'editing');
 								this.modal.classList.add('map--full');
 
 								this.updateRemoveFormActionId( _id );
@@ -776,7 +797,13 @@ export default class CloseIo_Controller {
 									}
 								});
 
+								// console.log( this.list );
 
+								if ( ! this.list ) {
+									this.initList();
+
+									this.list.remove( 'index', 0 );
+								}
 
 								if ( this.list ) {
 									console.log( 'este lista' );
@@ -794,19 +821,7 @@ export default class CloseIo_Controller {
 									console.log( fd.tag );
 
 									this.list.reIndex();
-
-								// Init the List
-								} else {
-									console.log( 'nu este lista' );
-									if ( this.model.config.list ) {
-										this.list = new List( 'addresses__list', {
-											valueNames: [ 'list__address', 'tag', {
-												data: ['index']
-											}],
-											searchColumns: [ 'list__address' ]
-										});										
-									}
-								}
+								} 
 
 								if ( totalCounter === 1 )
 									slider.removeSlide( 1 );

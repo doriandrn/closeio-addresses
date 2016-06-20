@@ -43,12 +43,13 @@
 			font-size: 0;
 			padding: 0;
 			transition: all .1s ease-in-out;
+			opacity: 0;
+			visibility: hidden;
 
 			&:hover {
 				background: transparent;
 			}
 			
-
 			@include mq( 540px ) {
 				position: absolute 40px auto auto 40px;
 			}
@@ -152,6 +153,17 @@
 			&__title {
 				.suffix {
 					display: inline;
+				}
+			}
+		}
+
+		&.not-empty:not(.editing) {
+			.modal {
+				&__aside {
+					&__toggle {
+						opacity: 1;
+						visibility: visible;
+					}
 				}
 			}
 		}

@@ -202,8 +202,12 @@ export default class CloseIo_Maps {
   	});
 
 		modal.addEventListener( 'cancelAddNew' , ( e ) => {
+			console.log( 'cancelled' );
+
 			markers[ 0 ].setMap( null );
-			markers.splice( 0 ); 
+			markers.splice( 0, 1 ); 
+
+			console.log( 'after cancel', markers );
 		});
 
 		modal.addEventListener( 'markerDragged', ( e ) => {
@@ -237,6 +241,8 @@ export default class CloseIo_Maps {
 		modal.addEventListener( 'dragMarker', ( e ) => {
 			let i = e.detail.index;
 
+
+			console.log( markers, i );
 			markers[i].setDraggable( true );
 			
 			markers[i].addListener( 'dragstart', () => {
@@ -324,6 +330,8 @@ export default class CloseIo_Maps {
 		// Get the place details from the autocomplete object.
 		let place = autocomplete.getPlace();
 
+		console.log( place );
+
 		if ( ! place.geometry ) {
 			console.error( "Autocomplete's returned place contains no geometry" );
 			return;
@@ -344,11 +352,13 @@ export default class CloseIo_Maps {
 			}
 		}
 
-		if ( place.geometry.viewport ) {
-
+		if ( place.geometry.location ) {
 			setTimeout( () => {
 				window.dispatchEvent( new Event( 'resize' ) );
-				mapObj.fitBounds( place.geometry.viewport );
+
+				if ( place.geometry.viewport )
+					mapObj.fitBounds( place.geometry.viewport );
+				
 				mapObj.setCenter( place.geometry.location );
 			}, 150 );
 			
@@ -361,12 +371,7 @@ export default class CloseIo_Maps {
 					lng: place.geometry.location.lng()
 				}
 			}));
-
-		} else {
-			console.error( 'Could not get geometry viewport of selected addresss' );
 		}
-		
-
 	}
 
 	geolocate() {
