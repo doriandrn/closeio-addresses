@@ -162,6 +162,9 @@ export default class CloseIo_Controller {
 		// Tags
 		init.tags( this.form );
 		
+		// List
+		this.initList();
+
 		// Click actions & events
 		this.events( modal );
 	}
@@ -337,11 +340,17 @@ export default class CloseIo_Controller {
 		}
 
 		this.list = new List( 'addresses__list', {
-			valueNames: [ 'list__address', 'tag', {
-				data: ['index']
+			valueNames: [ 'list__address', {
+				attr: 'data-tag',
+				name: 'tag'
+			}, {
+				data: ['index'],
 			}],
-			searchColumns: [ 'list__address' ]
-		});										
+			searchColumns: [ 'list__address', 'tag' ]
+		});
+
+		if ( typeof this.list.get( 'list__address', 'No address' ) === 'object' )
+			this.list.remove( 'index', 0 );
 	}
 
 	
@@ -604,7 +613,7 @@ export default class CloseIo_Controller {
 								this.modal.classList.remove( 'modal__counter' );
 								
 							if ( c === 1 ) {
-								this.modal.classList.remove( 'not-empty' );
+								this.modal.classList.remove( 'not-empty', 'list--view' );
 								counter.textContent = 1;
 								this.slider.prependSlide([
 									'<div class="address__slide swiper-slide"><address class="address tag none">' + none + '</address></div>'
@@ -632,6 +641,7 @@ export default class CloseIo_Controller {
 
 					modal.classList.toggle( 'map--full', ! toggle );
 					modal.classList.toggle( 'map', toggle );
+					modal.classList.toggle( 'editing', toggle );
 					modal.classList.remove( 'list--view' );
 
 					this.updateFormData( this.state );
@@ -679,7 +689,7 @@ export default class CloseIo_Controller {
 							let response = JSON.parse( xhttp.responseText );
 							
 							if ( response.ok ) {
-								this.modal.classList.remove( 'map' );
+								this.modal.classList.remove( 'map', 'editing' );
 								this.modal.classList.add( 'map--full' );
 
 								_.each( fd, ( value, key ) => {
@@ -797,16 +807,7 @@ export default class CloseIo_Controller {
 									}
 								});
 
-								// console.log( this.list );
-
-								if ( ! this.list ) {
-									this.initList();
-
-									this.list.remove( 'index', 0 );
-								}
-
 								if ( this.list ) {
-									console.log( 'este lista' );
 									_.each( listItems, ( li ) => {
 										let i = parseInt( li.dataset.index );
 										li.dataset.index = i+1;
@@ -817,8 +818,6 @@ export default class CloseIo_Controller {
 										tag: fd.tag,
 										index: 0
 									});
-
-									console.log( fd.tag );
 
 									this.list.reIndex();
 								} 

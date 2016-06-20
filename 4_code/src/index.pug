@@ -4,24 +4,26 @@ block addressmodal
 	.modal.modal__address(class=(adr.length ? 'not-empty map--full' : '' ) + ' ' + ( adr.length > 1 ? 'modal__counter' : '' ) )
 		aside.modal__aside
 			#addresses__list.addresses__list
-				.list__search
-					input.search(type="text" placeholder="Search..." name="search")
-				.list__actions
-					button.sort.button.button__small(data-sort="list__address") A-Z
-					button.sort.button.button__small(data-sort="tag") Tag
-					button.sort.button.button__small(data-sort="index") i
-				ul.list
-					if adr.length
-						- var i = -1;
-						each address in adr
-							- i+=1
-							li(data-index=i)
-								h4.list__address(data-action='swipe-to')=address.address
-								span.list__tag.tag.color(data-tag=address.tag)=address.tag
-					else
-						li(data-index=0)
-							h4.list__address(data-action='swipe-to') No addresss
-							span.list__tag.tag.color(data-tag='other') Other
+				header.list__header
+					.list__search
+						input.search(type="text" placeholder="Search..." name="search")
+					.list__actions
+						button.sort.button.button__small(data-sort="list__address") A-Z
+						button.sort.button.button__small(data-sort="tag") Tag
+						button.sort.button.button__small(data-sort="index") Index
+				section.list__list
+					ul.list
+						if adr.length
+							- var i = -1;
+							each address in adr
+								- i+=1
+								li(data-index=i)
+									h4.list__address(data-action='swipe-to')=address.address
+									span.list__tag.tag.color(data-tag=address.tag)
+						else
+							li(data-index=0)
+								h4.list__address(data-action='swipe-to') No address
+								span.list__tag.tag.color(data-tag='other')
 
 		main.modal__main
 			.modal__header

@@ -9,13 +9,6 @@ $hamburgerHover: #555555;
           left: 15px;
           opacity: 0;
           background: transparent;
-          animation: showDots .2s .2s forwards;
-          &:before {
-            animation: toCloseDotsTop .6s .2s forwards;
-          }
-          &:after {
-            animation: toCloseDotsBottom .6s .2s forwards;
-          }
         }
 
         path {
@@ -50,19 +43,21 @@ $hamburgerHover: #555555;
   }
 
   &:hover {
-    .dots {
-      background: $hamburgerHover;
-
-      &:before,
-      &:after {
+    .nav-svg {
+      .dots {
         background: $hamburgerHover;
+
+        &:before,
+        &:after {
+          background: $hamburgerHover;
+        }
+
       }
 
-    }
-
-    svg {
-      path {
-        stroke: $hamburgerHover;
+      svg {
+        path {
+          stroke: $hamburgerHover;
+        }
       }
     }
   }

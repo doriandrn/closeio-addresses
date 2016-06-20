@@ -147,6 +147,14 @@
 			&__counter {
 				display: inline-block;
 			}
+
+			&__prev,
+			&__next {
+				&.button {
+					opacity: 1;
+					visibility: visible;
+				}
+			}
 		}
 
 		.modal {

@@ -151,20 +151,8 @@ export default class CloseIo_Maps {
 			} else {
 				let position = new google.maps.LatLng( { lat: parseFloat( address.dataset.lat ), lng: parseFloat( address.dataset.lng ) } );
 						
-					// marker = this.addMarker( position, address.textContent, true );
-				// setTimeout( () => {
-					this.addMarker( position, address.textContent, true );
-				// }, 500 )
-
-
-				// bounds.extend( marker.getPosition() );
+				this.addMarker( position, address.textContent, true );
 			}
-		});
-		// markers.reverse();
-		let cc = 0;
-		_.each( markers, (mark) => {
-			console.log( mark.label, cc );
-			cc += 1;
 		});
 
 
@@ -222,11 +210,8 @@ export default class CloseIo_Maps {
 					pos 	= e.detail.position || {},
 					cancel = e.detail.cancel;
 
-			if ( ! pos ) {
-				return;
-			}
-
 			if ( ! cancel && pos ) {
+				console.log( 'yayo' );
 				backupMarker = {
 					lat: markers[ index ].position.lat(),
 					lng: markers[ index ].position.lng()
@@ -236,18 +221,17 @@ export default class CloseIo_Maps {
 			else {
 				markers[ index ].setPosition( backupMarker );
 			}
+			
+			markers[ index ].setDraggable( false );
 		});
 
 		modal.addEventListener( 'dragMarker', ( e ) => {
 			let i = e.detail.index;
 
-
-			console.log( markers, i );
 			markers[i].setDraggable( true );
-			
-			markers[i].addListener( 'dragstart', () => {
-				console.log( 'dragging' );
-			});
+
+			backupMarker = markers[i].getPosition();
+
 			markers[i].addListener( 'dragend', () => {
 				let pos = markers[i].getPosition(),
 						lat = pos.lat(),
@@ -330,8 +314,6 @@ export default class CloseIo_Maps {
 		// Get the place details from the autocomplete object.
 		let place = autocomplete.getPlace();
 
-		console.log( place );
-
 		if ( ! place.geometry ) {
 			console.error( "Autocomplete's returned place contains no geometry" );
 			return;
@@ -371,6 +353,8 @@ export default class CloseIo_Maps {
 					lng: place.geometry.location.lng()
 				}
 			}));
+		} else {
+			console.error( 'Invalid address supplied.' );
 		}
 	}
 
