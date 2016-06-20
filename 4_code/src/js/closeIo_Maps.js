@@ -53,18 +53,6 @@ export default class CloseIo_Maps {
 
     	this.modal.dispatchEvent( new CustomEvent( 'markerClick', { detail: { index: i } } ) );
   	});
-
-
-	  // marker.addListener( 'dragstart', () => {
-	  // 	console.log( 'dragging' );
-	  // });
-
-	  // marker.addListener( 'dragend', () => {
-	  // 	console.log( 'dragged' );
-	  // });
-
-	  // if ( ret )
-	  // 	return marker;
 	}
 
 	// Sets the map on all markers in the array.
@@ -208,6 +196,8 @@ export default class CloseIo_Maps {
 			    	results: results,
 			    }
 		    }));
+
+		    this.modal.dispatchEvent( new CustomEvent( 'dragMarker', { detail: { index: 0 } } ) );
     	});
   	});
 

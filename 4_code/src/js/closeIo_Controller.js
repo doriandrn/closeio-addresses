@@ -156,9 +156,6 @@ export default class CloseIo_Controller {
 		init.slider( me );
 		this.slider = new Swiper( '.address__container', this.model.config.slider );
 
-		// List
-		this.makeList();
-
 		// The counter
 		init.counter();
 
@@ -167,18 +164,6 @@ export default class CloseIo_Controller {
 		
 		// Click actions & events
 		this.events( modal );
-	}
-
-	makeList() {
-		if ( ! this.model.config.list )
-			return;
-
-		this.list = new List( 'addresses__list', {
-			valueNames: [ 'list__address', 'tag', {
-				data: ['index']
-			}],
-			searchColumns: [ 'list__address' ]
-		});
 	}
 
 	events( binder ) {
@@ -209,6 +194,8 @@ export default class CloseIo_Controller {
 				}));
 
 				this.state = 'editing';
+
+				this.modal.dispatchEvent( new CustomEvent( 'dragMarker', { detail: { index: 0 } } ) );
 			}
 
 			modal.classList.add( 'map' );
@@ -246,7 +233,6 @@ export default class CloseIo_Controller {
 			
 			input.value = results.formatted_address || "";
 		});
-
 
 		binder.addEventListener( 'addNew', ( e ) => {
 			let totalCounter 	= this.modalElements.totalCounter,
@@ -451,8 +437,6 @@ export default class CloseIo_Controller {
 				'swipe-to': ( target ) => {
 					let index = target.parentNode.dataset.index;
 
-					console.log( index );
-
 					if ( ! index )
 						return;
 
@@ -524,7 +508,7 @@ export default class CloseIo_Controller {
 					} else {
 
 						event.preventDefault();
-						modal.dispatchEvent( new CustomEvent( 'cancelAddNew' ) );
+						// modal.dispatchEvent( new CustomEvent( 'cancelAddNew' ) );
 
 						modal.classList.remove( 'not-empty', 'map' );
 						delete next.dataset.action;
@@ -675,7 +659,7 @@ export default class CloseIo_Controller {
 							
 							if ( response.ok ) {
 								this.modal.classList.remove( 'map' );
-								this.modal.classList.add('map--full');
+								this.modal.classList.add( 'map--full' );
 
 								_.each( fd, ( value, key ) => {
 									switch( key ) {
@@ -792,8 +776,10 @@ export default class CloseIo_Controller {
 									}
 								});
 
-								if ( this.list ) {
 
+
+								if ( this.list ) {
+									console.log( 'este lista' );
 									_.each( listItems, ( li ) => {
 										let i = parseInt( li.dataset.index );
 										li.dataset.index = i+1;
@@ -808,6 +794,18 @@ export default class CloseIo_Controller {
 									console.log( fd.tag );
 
 									this.list.reIndex();
+
+								// Init the List
+								} else {
+									console.log( 'nu este lista' );
+									if ( this.model.config.list ) {
+										this.list = new List( 'addresses__list', {
+											valueNames: [ 'list__address', 'tag', {
+												data: ['index']
+											}],
+											searchColumns: [ 'list__address' ]
+										});										
+									}
 								}
 
 								if ( totalCounter === 1 )
